@@ -1,0 +1,3307 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SCI3D V2.1 — Enhanced Visuals & 3D Lab</title>
+
+  <!-- Immediate Critical Styles & Dark Futuristic Theme Base -->
+  <style>
+    /* Mandatory display & visibility guarantees */
+    .hidden { display: none !important; }
+
+    :root {
+      --bg-dark: #070b14;
+      --surface-dark: #0d1527;
+      --card-dark: #131f38;
+      --border-dark: #1e293b;
+      --cyan-neon: #00f2fe;
+      --sky-neon: #38bdf8;
+      --amber-neon: #f59e0b;
+      --emerald-neon: #10b981;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #070b14 !important;
+      color: #f1f5f9 !important;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif;
+      min-height: 100vh;
+      line-height: 1.5;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Clean Glassmorphic Panels */
+    .glass-panel {
+      background: rgba(13, 21, 39, 0.82) !important;
+      backdrop-filter: blur(12px) !important;
+      -webkit-backdrop-filter: blur(12px) !important;
+      border: 1px solid rgba(56, 189, 248, 0.18) !important;
+      border-radius: 0.875rem;
+    }
+
+    .glass-panel-glow {
+      box-shadow: 0 0 25px -5px rgba(56, 189, 248, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    }
+
+    .badge-glow {
+      box-shadow: 0 0 14px -2px rgba(56, 189, 248, 0.45);
+    }
+
+    .glow-amber {
+      box-shadow: 0 0 14px -2px rgba(245, 158, 11, 0.45);
+    }
+
+    /* Custom horizontal scrollbar for tabs */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* Scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #070b14;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1e293b;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #38bdf8;
+    }
+
+    /* Sliders styling */
+    input[type=range] {
+      -webkit-appearance: none;
+      background: #1e293b;
+      border-radius: 9999px;
+      height: 6px;
+      outline: none;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #38bdf8;
+      cursor: pointer;
+      box-shadow: 0 0 10px #38bdf8;
+      border: 2px solid #070b14;
+    }
+  </style>
+
+  <!-- Tailwind CSS Framework CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            'sci-dark': '#070b14',
+            'sci-surface': '#0d1527',
+            'sci-card': '#131f38',
+            'sci-border': '#1e293b',
+            'sci-cyan': '#00f2fe',
+            'sci-blue': '#4facfe',
+            'sci-accent': '#38bdf8',
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- Three.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body class="bg-sci-dark text-slate-100 min-h-screen flex flex-col font-sans selection:bg-sky-500 selection:text-white">
+
+  <!-- ========================================================================= -->
+  <!-- TOP NAVIGATION HEADER -->
+  <!-- ========================================================================= -->
+  <header class="sticky top-0 z-50 border-b border-sci-border/80 bg-sci-surface/95 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2.5">
+      <div class="flex items-center justify-between gap-3">
+        
+        <!-- Brand Logo -->
+        <div class="flex items-center space-x-3 cursor-pointer shrink-0" onclick="switchNavTab('equation-playground')">
+          <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-sky-500 via-indigo-500 to-amber-400 p-[2px] shadow-lg shadow-sky-500/20">
+            <div class="w-full h-full bg-sci-dark rounded-[10px] flex items-center justify-center">
+              <span class="text-xs font-black font-mono tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-amber-300">SCI</span>
+            </div>
+          </div>
+          <div>
+            <div class="flex items-center space-x-1.5">
+              <span class="text-sm sm:text-base font-extrabold tracking-wider text-white">SCI<span class="text-sky-400">3D</span></span>
+              <span class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-sky-500/20 text-sky-300 border border-sky-500/40">V2.1</span>
+            </div>
+            <span class="text-[9px] sm:text-[10px] font-mono text-slate-400 block -mt-0.5">Quantum & Science Studio</span>
+          </div>
+        </div>
+
+        <!-- Quick Status & Level Pill -->
+        <div class="flex items-center space-x-2 shrink-0">
+          <button onclick="switchNavTab('courses-academy')" class="flex items-center space-x-1.5 bg-amber-500/10 border border-amber-500/30 px-2 sm:px-3 py-1.5 rounded-lg text-amber-300 hover:bg-amber-500/20 transition text-xs font-semibold">
+            <span>🎓 Level <span id="hdr-lvl-num">4</span>/19</span>
+            <span class="hidden sm:inline text-[10px] bg-amber-500/20 px-1 py-0.5 rounded text-amber-200">MAX: 19</span>
+          </button>
+          <button onclick="switchNavTab('nova-ai')" class="flex items-center space-x-1.5 bg-indigo-600/20 border border-indigo-500/40 px-2 sm:px-3 py-1.5 rounded-lg text-indigo-300 hover:bg-indigo-600/30 transition text-xs font-bold">
+            <span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span>
+            <span>NOVA AI</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Always-Visible Horizontally Scrollable Navigation Strip -->
+      <nav class="flex items-center space-x-1.5 overflow-x-auto no-scrollbar pt-2.5 pb-1 text-xs font-medium border-t border-sci-border/40 mt-2">
+        <button onclick="switchNavTab('equation-playground')" id="nav-equation-playground" class="nav-btn px-3 py-1.5 rounded-lg shrink-0 transition flex items-center space-x-1.5 bg-sky-500/20 text-sky-300 border border-sky-500/50 badge-glow font-bold">
+          <svg class="w-3.5 h-3.5 text-sky-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19L19 4M4 4l15 15"/></svg>
+          <span>📐 Equation Playground</span>
+          <span class="w-1.5 h-1.5 rounded-full bg-sky-400 animate-ping"></span>
+        </button>
+
+        <button onclick="switchNavTab('courses-academy')" id="nav-courses-academy" class="nav-btn px-3 py-1.5 rounded-lg shrink-0 text-slate-300 hover:text-white hover:bg-sci-card transition flex items-center space-x-1.5 border border-transparent">
+          <svg class="w-3.5 h-3.5 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+          <span class="font-semibold text-amber-300">Courses (19 Levels)</span>
+        </button>
+
+        <button onclick="switchNavTab('virtual-labs')" id="nav-virtual-labs" class="nav-btn px-3 py-1.5 rounded-lg shrink-0 text-slate-300 hover:text-white hover:bg-sci-card transition flex items-center space-x-1.5 border border-transparent">
+          <svg class="w-3.5 h-3.5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v7.31L4.15 19.3A2 2 0 0 0 5.86 22h12.28a2 2 0 0 0 1.71-2.7L14 9.31V2"/></svg>
+          <span>17 Virtual Labs</span>
+        </button>
+
+        <button onclick="switchNavTab('explorer-3d')" id="nav-explorer-3d" class="nav-btn px-3 py-1.5 rounded-lg shrink-0 text-slate-300 hover:text-white hover:bg-sci-card transition flex items-center space-x-1.5 border border-transparent">
+          <svg class="w-3.5 h-3.5 text-purple-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+          <span>3D Explorer</span>
+        </button>
+
+        <button onclick="switchNavTab('periodic-table')" id="nav-periodic-table" class="nav-btn px-3 py-1.5 rounded-lg shrink-0 text-slate-300 hover:text-white hover:bg-sci-card transition flex items-center space-x-1.5 border border-transparent">
+          <svg class="w-3.5 h-3.5 text-pink-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg>
+          <span>Periodic Table</span>
+        </button>
+
+        <button onclick="switchNavTab('space-orrery')" id="nav-space-orrery" class="nav-btn px-3 py-1.5 rounded-lg shrink-0 text-slate-300 hover:text-white hover:bg-sci-card transition flex items-center space-x-1.5 border border-transparent">
+          <svg class="w-3.5 h-3.5 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="19" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><path d="M10.4 21.9a10 10 0 0 0 9.9-9.9M3.6 12A10 10 0 0 1 12 2.1"/></svg>
+          <span>Space Orrery</span>
+        </button>
+
+        <button onclick="switchNavTab('science-facts')" id="nav-science-facts" class="nav-btn px-3 py-1.5 rounded-lg shrink-0 text-slate-300 hover:text-white hover:bg-sci-card transition flex items-center space-x-1.5 border border-transparent">
+          <svg class="w-3.5 h-3.5 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3z"/></svg>
+          <span>Facts & Pictures</span>
+        </button>
+
+        <button onclick="switchNavTab('mission-control')" id="nav-mission-control" class="nav-btn px-3 py-1.5 rounded-lg shrink-0 text-slate-300 hover:text-white hover:bg-sci-card transition flex items-center space-x-1.5 border border-transparent">
+          <svg class="w-3.5 h-3.5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+          <span>Dashboard</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ========================================================================= -->
+  <!-- MAIN APP CONTAINER -->
+  <!-- ========================================================================= -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-5">
+
+    <!-- ========================================================================= -->
+    <!-- VIEW 1: EQUATION PLAYGROUND (DEFAULT VIEW - NOT HIDDEN) -->
+    <!-- ========================================================================= -->
+    <section id="view-equation-playground" class="tab-content space-y-6">
+
+      <!-- Hero Banner with Vector Waveform Schematic -->
+      <div class="glass-panel glass-panel-glow p-5 sm:p-6 border-sky-500/30 relative overflow-hidden">
+        <div class="absolute -right-16 -top-16 w-64 h-64 bg-sky-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 relative z-10">
+          <div>
+            <div class="inline-flex items-center space-x-2 px-2.5 py-1 rounded-full bg-sky-500/15 border border-sky-500/30 text-sky-300 text-xs font-mono mb-2">
+              <span class="w-2 h-2 rounded-full bg-sky-400 animate-ping"></span>
+              <span>INTERACTIVE PHYSICS & MATH LABORATORY</span>
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white flex items-center space-x-2">
+              <span>EQUATION PLAYGROUND</span>
+            </h1>
+            <p class="text-xs sm:text-sm text-slate-300 mt-1 max-w-2xl">
+              Turn abstract scientific equations into live experiments. Adjust variables in real-time, observe physics simulations, view interactive Cartesian graphs, and challenge your understanding.
+            </p>
+          </div>
+
+          <!-- Hero Vector Graphic SVG -->
+          <div class="w-full md:w-56 h-20 shrink-0 bg-sci-card/60 rounded-xl border border-sky-500/20 p-2 flex flex-col justify-center">
+            <div class="flex items-center justify-between text-[10px] font-mono text-sky-400 mb-1 px-1">
+              <span>f(x) = A·sin(ωt)</span>
+              <span class="text-emerald-400">60 FPS LIVE</span>
+            </div>
+            <svg class="w-full h-11" viewBox="0 0 200 40">
+              <path d="M0,20 Q25,0 50,20 T100,20 T150,20 T200,20" fill="none" stroke="#38bdf8" stroke-width="2"/>
+              <path d="M0,20 Q25,35 50,20 T100,20 T150,20 T200,20" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="3,3"/>
+              <circle cx="100" cy="20" r="3" fill="#00f2fe"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Search & Filter Controls -->
+        <div class="mt-5 pt-4 border-t border-sci-border/60 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div class="relative w-full sm:w-72">
+            <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <input type="text" id="eq-search-input" oninput="filterEquations()" placeholder="Search equations (e.g. F=ma, Ohm, Gravity)..." class="w-full bg-sci-card/80 border border-sci-border rounded-lg pl-9 pr-3 py-1.5 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-sky-400">
+          </div>
+
+          <div class="flex items-center space-x-1.5 overflow-x-auto w-full sm:w-auto no-scrollbar pb-1 sm:pb-0">
+            <button onclick="setEqCategory('all')" id="btn-cat-all" class="eq-cat-btn px-2.5 py-1 rounded-md text-xs font-semibold bg-sky-500 text-slate-950">All</button>
+            <button onclick="setEqCategory('physics')" id="btn-cat-physics" class="eq-cat-btn px-2.5 py-1 rounded-md text-xs font-semibold bg-sci-card text-slate-300 hover:text-white">Physics</button>
+            <button onclick="setEqCategory('space')" id="btn-cat-space" class="eq-cat-btn px-2.5 py-1 rounded-md text-xs font-semibold bg-sci-card text-slate-300 hover:text-white">Space & Gravity</button>
+            <button onclick="setEqCategory('math')" id="btn-cat-math" class="eq-cat-btn px-2.5 py-1 rounded-md text-xs font-semibold bg-sci-card text-slate-300 hover:text-white">Mathematics</button>
+            <button onclick="setEqCategory('chemistry')" id="btn-cat-chemistry" class="eq-cat-btn px-2.5 py-1 rounded-md text-xs font-semibold bg-sci-card text-slate-300 hover:text-white">Chemistry</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACTIVE WORKSTATION (Top interactive panel) -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        
+        <!-- Left Column: Controls & Values (5 cols) -->
+        <div class="lg:col-span-5 space-y-4">
+          <div class="glass-panel p-4 sm:p-5 border-sky-500/20">
+            <div class="flex items-center justify-between pb-3 border-b border-sci-border/60">
+              <div>
+                <span id="active-eq-category" class="text-[10px] font-mono uppercase tracking-wider text-sky-400 font-bold">PHYSICS MODEL</span>
+                <h2 id="active-eq-title" class="text-xl font-black text-white">Newton's Second Law</h2>
+              </div>
+              <span id="active-eq-formula" class="text-sm font-mono px-2.5 py-1 rounded-lg bg-sky-500/20 text-sky-300 border border-sky-500/40 font-bold">F = ma</span>
+            </div>
+
+            <!-- Real-time Result Callout -->
+            <div class="mt-4 p-3.5 rounded-xl bg-gradient-to-r from-sky-950/60 to-indigo-950/60 border border-sky-500/30 flex items-center justify-between">
+              <div>
+                <span id="active-result-label" class="text-xs text-slate-300 uppercase tracking-wider font-semibold">Calculated Force (F)</span>
+                <div class="text-2xl sm:text-3xl font-mono font-black text-transparent bg-clip-text bg-gradient-to-r from-sky-300 via-cyan-200 to-amber-300">
+                  <span id="active-result-val">20.00</span> <span id="active-result-unit" class="text-base text-sky-400">N</span>
+                </div>
+              </div>
+              <button onclick="saveExperimentResult()" class="px-3 py-1.5 rounded-lg bg-sky-500/20 hover:bg-sky-500/30 border border-sky-400/30 text-sky-300 text-xs font-semibold flex items-center space-x-1">
+                <span>Save Run</span>
+              </button>
+            </div>
+
+            <!-- Dynamic Interactive Variables Sliders -->
+            <div class="mt-4 space-y-4" id="variables-container">
+              <!-- Rendered via JS based on selected equation -->
+            </div>
+
+            <!-- Action Controls Row -->
+            <div class="mt-5 pt-4 border-t border-sci-border/60 flex flex-wrap items-center justify-between gap-2 text-xs">
+              <button onclick="resetCurrentVariables()" class="px-3 py-1.5 rounded-lg bg-sci-card text-slate-300 hover:text-white border border-sci-border flex items-center space-x-1">
+            <!-- Understand the Equation Information Card -->
+            <div class="glass-panel p-4 sm:p-5 border-slate-700/50 space-y-3">
+              <div class="flex items-center justify-between">
+                <h3 class="text-sm font-bold text-white flex items-center space-x-1.5">
+                  <span>💡 Understand The Equation</span>
+                </h3>
+                <!-- Difficulty tabs -->
+                <div class="flex items-center space-x-1 bg-sci-card p-0.5 rounded-md border border-sci-border text-[10px]">
+                  <button onclick="setExplainerLevel('beginner')" id="exp-lvl-beginner" class="px-2 py-0.5 rounded text-sky-300 font-semibold bg-sky-500/20">Beginner</button>
+                  <button onclick="setExplainerLevel('school')" id="exp-lvl-school" class="px-2 py-0.5 rounded text-slate-400 hover:text-white">School</button>
+                  <button onclick="setExplainerLevel('advanced')" id="exp-lvl-advanced" class="px-2 py-0.5 rounded text-slate-400 hover:text-white">Advanced</button>
+                </div>
+              </div>
+
+              <p id="explainer-text" class="text-xs text-slate-300 leading-relaxed">
+                When you push an object, how fast it accelerates depends directly on the force you apply and inversely on how heavy (massive) it is.
+              </p>
+
+              <div class="p-2.5 rounded-lg bg-sci-card/60 border border-sci-border/50 text-[11px] text-slate-300 space-y-1">
+                <div class="text-amber-300 font-semibold">Sensitivity Insight:</div>
+                <div id="explainer-sensitivity">If you double the mass while keeping force constant, the acceleration is cut in half.</div>
+              </div>
+
+              <!-- Gemini Powered Action Bar -->
+              <div class="pt-2 border-t border-sci-border/60 flex flex-wrap items-center gap-2">
+                <button onclick="speakEquationIntuition()" id="btn-ai-tts" class="flex-1 py-1.5 px-2.5 rounded-lg bg-sky-500/15 hover:bg-sky-500/25 border border-sky-500/40 text-sky-300 text-xs font-semibold flex items-center justify-center space-x-1.5 transition">
+                  <span id="tts-icon">🔊</span>
+                  <span id="tts-label">Listen (Gemini Voice)</span>
+                </button>
+                <button onclick="generateDeepAIDerivation()" id="btn-ai-derivation" class="flex-1 py-1.5 px-2.5 rounded-lg bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/40 text-indigo-300 text-xs font-semibold flex items-center justify-center space-x-1.5 transition">
+                  <span>✨</span>
+                  <span>AI Deep Derivation</span>
+                </button>
+              </div>
+              <div id="ai-derivation-output" class="hidden p-3 rounded-lg bg-indigo-950/40 border border-indigo-500/30 text-xs text-slate-200 font-mono space-y-1.5"></div>
+            </div>
+          </div>
+
+        <!-- Right Column: Visual Physics Simulation & Cartesian Graph (7 cols) -->
+        <div class="lg:col-span-7 space-y-4">
+          
+          <!-- Live Physical Simulation Canvas Panel -->
+          <div class="glass-panel p-4 border-sky-500/25 relative">
+            <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center space-x-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                <h3 class="text-xs sm:text-sm font-bold text-white uppercase tracking-wider">LIVE PHYSICAL SIMULATION</h3>
+              </div>
+              <span id="sim-status-badge" class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">SIMULATING (60 FPS)</span>
+            </div>
+
+            <!-- 2D Canvas Physical Model Display -->
+            <div class="w-full h-52 sm:h-60 bg-sci-dark/90 rounded-xl border border-sci-border overflow-hidden relative">
+              <canvas id="canvas-physics-sim" class="w-full h-full block"></canvas>
+              <div id="sim-hud-overlay" class="absolute bottom-2 left-2 pointer-events-none text-[10px] font-mono text-slate-400 bg-sci-card/80 px-2 py-1 rounded border border-sci-border/60">
+                Mass: 5.0 kg | Accel: 4.0 m/s² | Force: 20 N
+              </div>
+            </div>
+          </div>
+
+          <!-- Real-Time Cartesian Graph Panel -->
+          <div class="glass-panel p-4 border-sky-500/25">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+              <div>
+                <h3 class="text-xs sm:text-sm font-bold text-white uppercase tracking-wider">CARTESIAN LIVE GRAPH</h3>
+                <span id="graph-eq-label" class="text-[10px] font-mono text-sky-400">y = f(x) relationship curve</span>
+              </div>
+              <!-- Graph Controls (Zoom, Reset) -->
+              <div class="flex items-center space-x-1.5 text-xs">
+                <button onclick="zoomGraph(1.2)" class="px-2 py-1 rounded bg-sci-card text-slate-300 hover:text-white border border-sci-border font-mono text-xs">+</button>
+                <button onclick="zoomGraph(0.8)" class="px-2 py-1 rounded bg-sci-card text-slate-300 hover:text-white border border-sci-border font-mono text-xs">-</button>
+                <button onclick="resetGraphZoom()" class="px-2 py-1 rounded bg-sci-card text-slate-300 hover:text-white border border-sci-border text-[11px]">Reset</button>
+              </div>
+            </div>
+
+            <!-- Graph Canvas -->
+            <div class="w-full h-52 sm:h-56 bg-sci-dark/95 rounded-xl border border-sci-border overflow-hidden relative">
+              <canvas id="canvas-live-graph" class="w-full h-full block"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- COMPARE MODE PANEL (A vs B) -->
+      <div id="compare-panel" class="glass-panel p-5 border-amber-500/30 hidden">
+        <div class="flex items-center justify-between pb-3 border-b border-sci-border">
+          <div class="flex items-center space-x-2">
+            <span class="text-amber-400 text-base">⇄</span>
+            <h3 class="text-base font-bold text-white">Compare Configurations (Experiment A vs B)</h3>
+          </div>
+          <button onclick="toggleCompareMode()" class="text-xs text-slate-400 hover:text-white">✕ Close</button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4 text-xs">
+          <!-- Setup A -->
+          <div class="p-3.5 rounded-xl bg-sci-card/70 border border-sky-500/30">
+            <div class="font-bold text-sky-400 uppercase tracking-wider mb-2">Experiment A (Current)</div>
+            <div id="compare-data-a" class="space-y-1 font-mono text-slate-300">
+              <!-- JS rendered -->
+            </div>
+          </div>
+
+          <!-- Setup B -->
+          <div class="p-3.5 rounded-xl bg-sci-card/70 border border-amber-500/30">
+            <div class="font-bold text-amber-400 uppercase tracking-wider mb-2">Experiment B (Modified)</div>
+            <div id="compare-data-b" class="space-y-2">
+              <label class="block text-slate-300">Multiplier on first variable:</label>
+              <input type="range" min="0.2" max="3.0" step="0.1" value="2.0" id="compare-multiplier" oninput="updateCompareB()" class="w-full">
+              <div class="text-[11px] font-mono text-amber-300" id="compare-b-readout">2.0× Multiplier</div>
+            </div>
+          </div>
+
+          <!-- Delta Analysis -->
+          <div class="p-3.5 rounded-xl bg-sci-card/70 border border-emerald-500/30">
+            <div class="font-bold text-emerald-400 uppercase tracking-wider mb-2">Percentage & Absolute Delta</div>
+            <div id="compare-delta-readout" class="space-y-1 text-slate-300 font-mono">
+              <!-- JS rendered -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================================================= -->
+      <!-- PRESET EQUATION LIBRARY GALLERY -->
+      <!-- ========================================================================= -->
+      <div class="space-y-3">
+        <div class="flex items-center justify-between">
+          <h2 class="text-lg font-bold text-white flex items-center space-x-2">
+            <span>📚 Interactive Equation Library</span>
+            <span id="eq-count-badge" class="text-xs font-mono text-sky-400 bg-sky-500/10 px-2 py-0.5 rounded border border-sky-500/30">20 Presets</span>
+          </h2>
+          <span class="text-xs text-slate-400">Click any card to load into the active simulator</span>
+        </div>
+
+        <div id="equation-library-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <!-- Populated dynamically with rich SVG diagrams & formulas via JS -->
+        </div>
+      </div>
+
+      <!-- EQUATION CHALLENGE & FORMULA BUILDER ROW -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        
+        <!-- Equation Challenge Panel -->
+        <div class="glass-panel p-5 border-amber-500/20 space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+              <span class="text-amber-400 text-lg">🎯</span>
+              <h3 class="text-sm sm:text-base font-bold text-white">Equation Practice Challenge</h3>
+            </div>
+            <div class="flex items-center space-x-2">
+              <button onclick="generateAIChallengeProblem()" id="btn-generate-ai-challenge" class="px-2 py-0.5 rounded bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 border border-indigo-500/50 text-[10px] font-mono flex items-center space-x-1 transition">
+                <span>✨ New AI Problem</span>
+              </button>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">SCORE: <span id="challenge-score">0</span> PTS</span>
+            </div>
+          </div>
+
+          <p id="challenge-prompt" class="text-xs sm:text-sm text-slate-200 leading-relaxed">
+            A satellite with a mass of 800 kg accelerates uniformly at 4.5 m/s² through orbital burns. Calculate the required thruster force in Newtons (N).
+          </p>
+
+          <div class="flex items-center space-x-2">
+            <input type="number" id="challenge-answer-input" placeholder="Enter calculated value..." class="w-full bg-sci-card border border-sci-border rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 font-mono">
+            <button onclick="checkChallengeAnswer()" class="px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs shrink-0 transition">
+              Solve
+            </button>
+          </div>
+
+          <div id="challenge-feedback" class="hidden p-2.5 rounded-lg text-xs font-mono"></div>
+
+          <div class="flex items-center justify-between pt-2 border-t border-sci-border/60 text-xs">
+            <button onclick="revealChallengeHint()" class="text-sky-400 hover:text-sky-300 flex items-center space-x-1">
+              <span>💡 Request Hint</span>
+            </button>
+            <button onclick="nextChallengeProblem()" class="text-amber-400 hover:text-amber-300 flex items-center space-x-1">
+              <span>Next Problem →</span>
+            </button>
+          </div>
+          <div id="challenge-hint-text" class="hidden text-[11px] text-sky-300/90 italic bg-sky-950/40 p-2 rounded border border-sky-500/20"></div>
+        </div>
+
+        <!-- Custom Formula Builder -->
+        <div class="glass-panel p-5 border-cyan-500/20 space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+              <span class="text-cyan-400 text-lg">⚡</span>
+              <h3 class="text-sm sm:text-base font-bold text-white">Custom Formula Builder</h3>
+            </div>
+            <span class="text-[10px] font-mono text-cyan-300 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/30">SYNTAX PARSER</span>
+          </div>
+
+          <p class="text-xs text-slate-300">
+            Compose a scientific expression. Use tokens or type standard algebra (e.g. <code>m * g * h</code> or <code>0.5 * m * v^2</code>).
+          </p>
+
+          <div class="flex items-center space-x-1.5">
+            <input type="text" id="builder-expr-input" value="m * a" placeholder="Type formula like: m * a or V / R" class="w-full bg-sci-card border border-sci-border rounded-lg px-3 py-2 text-xs text-white font-mono placeholder-slate-500 focus:outline-none focus:border-cyan-400">
+            <button onclick="compileCustomFormula()" class="px-3 py-2 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs shrink-0 transition">
+              Compile
+            </button>
+          </div>
+
+          <!-- Token shortcuts -->
+          <div class="flex flex-wrap gap-1 text-[11px] font-mono">
+            <button onclick="addBuilderToken('+')" class="px-2 py-0.5 rounded bg-sci-card hover:bg-slate-700 text-slate-300 border border-sci-border">+</button>
+            <button onclick="addBuilderToken('-')" class="px-2 py-0.5 rounded bg-sci-card hover:bg-slate-700 text-slate-300 border border-sci-border">-</button>
+            <button onclick="addBuilderToken('*')" class="px-2 py-0.5 rounded bg-sci-card hover:bg-slate-700 text-slate-300 border border-sci-border">×</button>
+            <button onclick="addBuilderToken('/')" class="px-2 py-0.5 rounded bg-sci-card hover:bg-slate-700 text-slate-300 border border-sci-border">÷</button>
+            <button onclick="addBuilderToken('^2')" class="px-2 py-0.5 rounded bg-sci-card hover:bg-slate-700 text-slate-300 border border-sci-border">x²</button>
+            <button onclick="addBuilderToken('sqrt(')" class="px-2 py-0.5 rounded bg-sci-card hover:bg-slate-700 text-slate-300 border border-sci-border">√x</button>
+            <button onclick="addBuilderToken('(')" class="px-2 py-0.5 rounded bg-sci-card hover:bg-slate-700 text-slate-300 border border-sci-border">(</button>
+            <button onclick="addBuilderToken(')')" class="px-2 py-0.5 rounded bg-sci-card hover:bg-slate-700 text-slate-300 border border-sci-border">)</button>
+          </div>
+
+          <div id="builder-status-msg" class="text-xs font-mono text-slate-400">Status: Ready to compile variables.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- VIEW 2: COURSES & MASTERY ACADEMY (19 LEVELS - MAX: 19) -->
+    <!-- ========================================================================= -->
+    <section id="view-courses-academy" class="tab-content hidden space-y-6">
+      
+      <!-- Curriculum Banner -->
+      <div class="glass-panel glass-panel-glow p-5 sm:p-6 border-amber-500/30 relative overflow-hidden">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <div class="inline-flex items-center space-x-2 px-2.5 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs font-mono mb-2">
+              <span>🎓 19-LEVEL COMPREHENSIVE SCIENCE CURRICULUM</span>
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-white">Courses & Scientific Mastery</h1>
+            <p class="text-xs sm:text-sm text-slate-300 mt-1 max-w-2xl">
+              Progress from fundamental measurements (Level 1) through Classical Physics, Electromagnetism, Quantum Mechanics, up to General Relativity & Cosmology (<span class="text-amber-300 font-bold">MAX LEVEL: 19</span>).
+            </p>
+          </div>
+
+          <!-- Progress Widget -->
+          <div class="w-full sm:w-64 p-3 bg-sci-card/80 rounded-xl border border-amber-500/30 space-y-2">
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-slate-300 font-semibold">Current Progress</span>
+              <span class="font-mono text-amber-400 font-bold">Level <span id="academy-lvl-label">4</span> / 19</span>
+            </div>
+            <div class="w-full bg-sci-dark rounded-full h-2.5 overflow-hidden border border-sci-border">
+              <div id="academy-progress-bar" class="bg-gradient-to-r from-amber-500 to-sky-400 h-full rounded-full transition-all duration-500" style="width: 21%;"></div>
+            </div>
+            <div class="flex items-center justify-between text-[10px] text-slate-400 font-mono">
+              <span>Rank: Junior Physicist</span>
+              <span>XP: <span id="academy-xp">420</span> / 1900</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 19 Levels Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="courses-levels-grid">
+        <!-- Rendered via JS -->
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- VIEW 3: 17 VIRTUAL LABS -->
+    <!-- ========================================================================= -->
+    <section id="view-virtual-labs" class="tab-content hidden space-y-6">
+      <div class="glass-panel p-5 border-emerald-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <div class="inline-flex items-center space-x-2 px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-mono mb-1.5">
+            <span>🔬 17 INTERACTIVE RESEARCH STATIONS</span>
+          </div>
+          <h1 class="text-2xl font-extrabold text-white">Virtual Science Laboratories</h1>
+          <p class="text-xs sm:text-sm text-slate-300">Hands-on simulated workstations for optics, thermodynamics, wave interferometry, electrostatics, and decay.</p>
+        </div>
+        <button onclick="switchNavTab('equation-playground')" class="px-3.5 py-2 rounded-lg bg-sky-500/20 text-sky-300 hover:bg-sky-500/30 border border-sky-500/40 text-xs font-semibold">
+          ← Open Equation Playground
+        </button>
+      </div>
+
+      <!-- Active Virtual Lab Station Canvas -->
+      <div class="glass-panel p-5 border-emerald-500/20 grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <div class="lg:col-span-8 space-y-3">
+          <div class="flex items-center justify-between">
+            <h2 id="vlab-title" class="text-base font-bold text-white">Lab Station #1: Snell's Law & Refraction Index</h2>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300">ACTIVE BENCH</span>
+          </div>
+          <div class="w-full h-72 bg-sci-dark rounded-xl border border-sci-border overflow-hidden relative">
+            <canvas id="canvas-vlab-sim" class="w-full h-full block"></canvas>
+          </div>
+        </div>
+
+        <div class="lg:col-span-4 space-y-4">
+          <div class="p-3.5 rounded-xl bg-sci-card border border-sci-border space-y-3">
+            <h3 class="text-xs font-bold text-white uppercase tracking-wider">Workstation Parameters</h3>
+            <div id="vlab-controls-container" class="space-y-3">
+              <!-- JS rendered -->
+            </div>
+          </div>
+          <div class="p-3.5 rounded-xl bg-sci-card border border-sci-border text-xs text-slate-300 space-y-1">
+            <div class="font-bold text-emerald-400">Observation Guide:</div>
+            <p id="vlab-desc">Adjust the incident angle to observe light ray refraction across interface boundaries according to n₁·sin(θ₁) = n₂·sin(θ₂).</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 17 Labs Station Selector Grid -->
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3" id="vlabs-list-grid">
+        <!-- JS rendered -->
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- VIEW 4: 3D SCIENCE EXPLORER -->
+    <!-- ========================================================================= -->
+    <section id="view-explorer-3d" class="tab-content hidden space-y-6">
+      <div class="glass-panel p-5 border-purple-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <div class="inline-flex items-center space-x-2 px-2.5 py-1 rounded-full bg-purple-500/15 border border-purple-500/30 text-purple-300 text-xs font-mono mb-1.5">
+            <span>🌐 WEBGL 3D SCIENTIFIC VISUALIZER</span>
+          </div>
+          <h1 class="text-2xl font-extrabold text-white">3D Science Model Explorer</h1>
+          <p class="text-xs sm:text-sm text-slate-300">Interact with atomic orbitals, crystalline lattices, DNA macromolecule helices, and black hole accretion disks.</p>
+        </div>
+        
+        <!-- Model Selector Dropdown -->
+        <select id="select-3d-model" onchange="load3DModel(this.value)" class="bg-sci-card border border-purple-500/40 text-white rounded-lg px-3 py-2 text-xs focus:outline-none">
+          <option value="dna">1. DNA Double Helix Macromolecule</option>
+          <option value="bohr">2. Bohr Quantized Atom & Shells</option>
+          <option value="water">3. H₂O Polar Covalent Molecule</option>
+          <option value="buckyball">4. Buckyball C60 Fullerene Cage</option>
+          <option value="nacl">5. NaCl Crystal Ionic Lattice</option>
+          <option value="blackhole">6. Kerr Black Hole & Accretion Disk</option>
+          <option value="dipole">7. Magnetic Dipole Field Lines</option>
+          <option value="orbital">8. Quantum Orbital Wave Function</option>
+        </select>
+      </div>
+
+      <!-- 3D Canvas WebGL Stage -->
+      <div class="glass-panel p-4 border-purple-500/20">
+        <div class="w-full h-96 bg-sci-dark/95 rounded-xl border border-sci-border overflow-hidden relative" id="threejs-container">
+          <!-- WebGL Renderer Canvas appended here -->
+          <div class="absolute top-3 left-3 bg-sci-card/80 px-2.5 py-1 rounded-md text-[10px] font-mono text-purple-300 border border-purple-500/30 pointer-events-none">
+            Drag mouse/touch to rotate • Scroll to zoom
+          </div>
+          <div id="model-3d-hud" class="absolute bottom-3 left-3 bg-sci-card/85 px-3 py-1.5 rounded-lg text-xs font-mono text-slate-200 border border-sci-border pointer-events-none">
+            Active: DNA Double Helix | Vertices: 2,400
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- VIEW 5: PERIODIC TABLE -->
+    <!-- ========================================================================= -->
+    <section id="view-periodic-table" class="tab-content hidden space-y-6">
+      <div class="glass-panel p-5 border-pink-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h1 class="text-2xl font-extrabold text-white">Interactive Periodic Table of Elements</h1>
+          <p class="text-xs sm:text-sm text-slate-300">118 elements with electron shells, atomic masses, electronegativity, and spectral characteristics.</p>
+        </div>
+        <div class="flex items-center space-x-2">
+          <input type="text" id="ptable-search" oninput="filterPTable()" placeholder="Search elements (H, Au, Carbon)..." class="bg-sci-card border border-sci-border text-white text-xs px-3 py-1.5 rounded-lg focus:outline-none focus:border-pink-400">
+        </div>
+      </div>
+
+      <!-- Selected Element Inspector Card -->
+      <div id="ptable-inspector" class="glass-panel p-5 border-pink-500/20 grid grid-cols-1 sm:grid-cols-4 gap-4">
+        <!-- JS rendered -->
+      </div>
+
+      <!-- Compact Periodic Grid -->
+      <div class="glass-panel p-4 overflow-x-auto no-scrollbar">
+        <div id="ptable-grid" class="grid grid-cols-18 gap-1.5 min-w-[800px] text-center font-mono">
+          <!-- JS populated 118 elements -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- VIEW 6: SPACE SOLAR ORRERY -->
+    <!-- ========================================================================= -->
+    <section id="view-space-orrery" class="tab-content hidden space-y-6">
+      <div class="glass-panel p-5 border-cyan-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h1 class="text-2xl font-extrabold text-white">Solar System Heliocentric Orrery</h1>
+          <p class="text-xs sm:text-sm text-slate-300">Keplerian orbital periods, semimajor axes, and planetary gravity relationships.</p>
+        </div>
+        <div class="flex items-center space-x-2 text-xs">
+          <button onclick="changeOrrerySpeed(0.5)" class="px-2.5 py-1 rounded bg-sci-card border border-sci-border text-slate-300">0.5×</button>
+          <button onclick="changeOrrerySpeed(1.0)" class="px-2.5 py-1 rounded bg-sky-500/20 border border-sky-500/40 text-sky-300 font-bold">1.0×</button>
+          <button onclick="changeOrrerySpeed(2.5)" class="px-2.5 py-1 rounded bg-sci-card border border-sci-border text-slate-300">2.5×</button>
+        </div>
+      </div>
+
+      <div class="glass-panel p-4 border-cyan-500/20">
+        <div class="w-full h-96 bg-sci-dark/95 rounded-xl border border-sci-border overflow-hidden relative">
+          <canvas id="canvas-space-orrery" class="w-full h-full block"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- VIEW 7: SCIENCE FACTS WITH VECTOR PICTURES -->
+    <!-- ========================================================================= -->
+    <section id="view-science-facts" class="tab-content hidden space-y-6">
+      <div class="glass-panel p-5 border-amber-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h1 class="text-2xl font-extrabold text-white">Illustrated Scientific Discoveries & Facts</h1>
+          <p class="text-xs sm:text-sm text-slate-300">Curated astrophysical, quantum, and biological phenomena paired with vector schematics.</p>
+        </div>
+        <button onclick="fetchGroundedScienceNews()" id="btn-fetch-grounded-news" class="px-3 py-1.5 rounded-lg bg-sky-500/20 hover:bg-sky-500/30 border border-sky-400/40 text-sky-300 text-xs font-semibold flex items-center space-x-1.5 transition shrink-0">
+          <span>🔍</span>
+          <span>Fetch 2026 Breakthroughs (Google Search)</span>
+        </button>
+      </div>
+
+      <!-- Real-Time Grounded Discoveries Panel -->
+      <div id="grounded-news-panel" class="hidden glass-panel p-5 border-sky-500/30 space-y-3 bg-gradient-to-r from-sci-card to-indigo-950/40">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <span class="w-2 h-2 rounded-full bg-sky-400 animate-ping"></span>
+            <h2 class="text-sm font-bold text-white uppercase tracking-wider">LIVE SEARCH-GROUNDED SCIENTIFIC FRONTIERS</h2>
+          </div>
+          <button onclick="document.getElementById('grounded-news-panel').classList.add('hidden')" class="text-xs text-slate-400 hover:text-white">✕ Close</button>
+        </div>
+        <div id="grounded-news-content" class="text-xs text-slate-200 leading-relaxed font-sans"></div>
+        <div id="grounded-news-sources" class="pt-2 border-t border-sci-border/60 flex flex-wrap gap-2 text-[10px] font-mono"></div>
+      </div>
+
+      <!-- Spotlight Fact -->
+      <div id="spotlight-fact-card" class="glass-panel p-5 border-amber-500/40 grid grid-cols-1 md:grid-cols-12 gap-5 items-center">
+        <!-- Populated via JS -->
+      </div>
+
+      <!-- Facts Gallery Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="facts-gallery-grid">
+        <!-- Populated via JS with inline SVGs -->
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- VIEW 8: MISSION CONTROL DASHBOARD -->
+    <!-- ========================================================================= -->
+    <section id="view-mission-control" class="tab-content hidden space-y-6">
+      <div class="glass-panel p-6 border-sky-500/30">
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-white">SCI3D Mission Control</h1>
+        <p class="text-xs sm:text-sm text-slate-300 mt-1">Unified access hub for all scientific laboratories, courses, and interactive simulation stations.</p>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+          <div onclick="switchNavTab('equation-playground')" class="p-4 rounded-xl bg-sci-card/80 border border-sky-500/40 hover:border-sky-400 cursor-pointer transition">
+            <span class="text-2xl">📐</span>
+            <h3 class="text-sm font-bold text-white mt-2">Equation Playground</h3>
+            <p class="text-[11px] text-slate-400 mt-1">Simulate F=ma, gravity, Ohm's law, and wave formulas in real-time.</p>
+          </div>
+
+          <div onclick="switchNavTab('courses-academy')" class="p-4 rounded-xl bg-sci-card/80 border border-amber-500/40 hover:border-amber-400 cursor-pointer transition">
+            <span class="text-2xl">🎓</span>
+            <h3 class="text-sm font-bold text-white mt-2">19-Level Courses</h3>
+            <p class="text-[11px] text-slate-400 mt-1">Step-by-step physics and chemistry curriculum from Level 1 to 19.</p>
+          </div>
+
+          <div onclick="switchNavTab('virtual-labs')" class="p-4 rounded-xl bg-sci-card/80 border border-emerald-500/40 hover:border-emerald-400 cursor-pointer transition">
+            <span class="text-2xl">🔬</span>
+            <h3 class="text-sm font-bold text-white mt-2">17 Virtual Labs</h3>
+            <p class="text-[11px] text-slate-400 mt-1">Hands-on benches for Snell's law, photoelectric effect, and gas chambers.</p>
+          </div>
+
+          <div onclick="switchNavTab('explorer-3d')" class="p-4 rounded-xl bg-sci-card/80 border border-purple-500/40 hover:border-purple-400 cursor-pointer transition">
+            <span class="text-2xl">🌐</span>
+            <h3 class="text-sm font-bold text-white mt-2">3D Science Explorer</h3>
+            <p class="text-[11px] text-slate-400 mt-1">Interactive 3D molecules, atoms, DNA, and black hole disks.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- VIEW 9: NOVA AI RESEARCH SCIENTIST -->
+    <!-- ========================================================================= -->
+    <section id="view-nova-ai" class="tab-content hidden space-y-6">
+      <div class="glass-panel p-5 border-indigo-500/30 flex items-center justify-between">
+        <div>
+          <h1 class="text-2xl font-extrabold text-white flex items-center space-x-2">
+            <span>NOVA AI Research Scientist</span>
+            <span class="text-xs font-mono px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/40">GEMINI ENGINE</span>
+          </h1>
+          <p class="text-xs text-slate-300">Your interactive science mentor for equations, conceptual breakdowns, and tutoring.</p>
+        </div>
+      </div>
+
+      <div class="glass-panel p-5 border-indigo-500/20 space-y-4">
+        <!-- Chat History Window -->
+        <div id="nova-chat-box" class="h-80 overflow-y-auto bg-sci-dark/95 rounded-xl p-4 border border-sci-border space-y-3 font-mono text-xs text-slate-200">
+          <div class="p-3 rounded-lg bg-sci-card/80 border border-indigo-500/30">
+            <div class="text-indigo-300 font-bold mb-1">NOVA Scientific Assistant:</div>
+            Greetings! I am NOVA, your quantum and physics research companion. Ask me anything about Newton's laws, kinetic energy, electromagnetic fields, or request a practice challenge!
+          </div>
+        </div>
+
+        <!-- Prompt Quick Buttons -->
+        <div class="flex flex-wrap gap-1.5 text-xs">
+          <button onclick="sendQuickNovaPrompt('Explain F = ma intuitively')" class="px-2.5 py-1 rounded bg-sci-card hover:bg-indigo-950/50 text-indigo-300 border border-indigo-500/30">Why does mass resist acceleration?</button>
+          <button onclick="sendQuickNovaPrompt('Explain the difference between KE and Momentum')" class="px-2.5 py-1 rounded bg-sci-card hover:bg-indigo-950/50 text-indigo-300 border border-indigo-500/30">KE vs Momentum</button>
+          <button onclick="sendQuickNovaPrompt('How does gravitational force decay with distance squared?')" class="px-2.5 py-1 rounded bg-sci-card hover:bg-indigo-950/50 text-indigo-300 border border-indigo-500/30">Inverse-Square Law</button>
+        </div>
+
+        <!-- Input Bar -->
+        <div class="flex items-center space-x-2">
+          <input type="text" id="nova-user-input" onkeydown="if(event.key==='Enter') sendNovaMessage()" placeholder="Ask NOVA a scientific question..." class="w-full bg-sci-card border border-sci-border rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-400">
+          <button onclick="sendNovaMessage()" id="btn-nova-send" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shrink-0 transition">
+            Send
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ========================================================================= -->
+  <!-- JAVASCRIPT: SCIENTIFIC ENGINES, EQUATIONS & VISUAL RENDERERS -->
+  <!-- ========================================================================= -->
+  <script>
+    /* =========================================================================
+       1. COMPLETE PRESET EQUATIONS DATA (Physics, Space, Math, Chemistry)
+       ========================================================================= */
+    const EQUATION_PRESETS = [
+      {
+        id: 'f-ma',
+        title: "Newton's Second Law",
+        formula: 'F = ma',
+        category: 'physics',
+        subject: 'Classical Mechanics',
+        difficulty: 'Fundamental',
+        resultLabel: 'Calculated Force (F)',
+        resultUnit: 'N',
+        variables: [
+          { key: 'm', label: 'Mass (m)', min: 1, max: 50, step: 0.5, default: 5, unit: 'kg' },
+          { key: 'a', label: 'Acceleration (a)', min: 0.5, max: 20, step: 0.5, default: 4, unit: 'm/s²' }
+        ],
+        compute: (v) => v.m * v.a,
+        graphFn: (v, x) => v.m * x, // y=Force, x=Accel
+        graphXLabel: 'Acceleration (m/s²)',
+        graphYLabel: 'Force (N)',
+        explainer: {
+          beginner: "When you push an object, the force you need is directly proportional to how heavy it is and how quickly you want to speed it up.",
+          school: "Newton's Second Law defines net force as the rate of change of momentum (F = dp/dt). For constant mass, F = ma.",
+          advanced: "In Newtonian mechanics, acceleration is the second time-derivative of position: F = m(d²r/dt²). In relativistic regimes, F = d(γmv)/dt.",
+          sensitivity: "Doubling mass while keeping acceleration constant doubles the required force."
+        },
+        simType: 'newton_cart',
+        svgIcon: `<svg viewBox="0 0 100 60" class="w-full h-full"><rect x="10" y="45" width="80" height="4" fill="#334155"/><rect x="25" y="25" width="40" height="20" rx="3" fill="#0284c7" stroke="#38bdf8" stroke-width="1.5"/><circle cx="35" cy="45" r="5" fill="#0f172a" stroke="#38bdf8"/><circle cx="55" cy="45" r="5" fill="#0f172a" stroke="#38bdf8"/><path d="M65 35 L85 35 M80 30 L85 35 L80 40" stroke="#f59e0b" stroke-width="2.5" fill="none"/></svg>`
+      },
+      {
+        id: 'v-u-at',
+        title: 'Kinematic Velocity',
+        formula: 'v = u + at',
+        category: 'physics',
+        subject: 'Kinematics',
+        difficulty: 'Fundamental',
+        resultLabel: 'Final Velocity (v)',
+        resultUnit: 'm/s',
+        variables: [
+          { key: 'u', label: 'Initial Velocity (u)', min: 0, max: 30, step: 1, default: 2, unit: 'm/s' },
+          { key: 'a', label: 'Acceleration (a)', min: 0.5, max: 15, step: 0.5, default: 3, unit: 'm/s²' },
+          { key: 't', label: 'Time Elapsed (t)', min: 1, max: 20, step: 0.5, default: 5, unit: 's' }
+        ],
+        compute: (v) => v.u + (v.a * v.t),
+        graphFn: (v, x) => v.u + (v.a * x), // y=v, x=t
+        graphXLabel: 'Time (s)',
+        graphYLabel: 'Velocity (m/s)',
+        explainer: {
+          beginner: "If you start moving at speed u and accelerate by a every second for t seconds, this formula calculates your final speed.",
+          school: "Linear velocity under constant acceleration: the slope of velocity vs. time is acceleration (dv/dt = a).",
+          advanced: "Integration of constant acceleration: v(t) = ∫ a dt = at + v(0).",
+          sensitivity: "Every extra second of time increases final velocity by exactly 'a' m/s."
+        },
+        simType: 'kinematics_trail',
+        svgIcon: `<svg viewBox="0 0 100 60" class="w-full h-full"><path d="M10 50 L90 50" stroke="#334155" stroke-width="2"/><circle cx="30" cy="35" r="8" fill="#38bdf8"/><path d="M40 35 L75 35 M70 30 L75 35 L70 40" stroke="#00f2fe" stroke-width="2"/><line x1="15" y1="35" x2="22" y2="35" stroke="#38bdf8" stroke-dasharray="2,2"/></svg>`
+      },
+      {
+        id: 'ke-half-mv2',
+        title: 'Kinetic Energy',
+        formula: 'KE = ½mv²',
+        category: 'physics',
+        subject: 'Work & Energy',
+        difficulty: 'Intermediate',
+        resultLabel: 'Kinetic Energy (KE)',
+        resultUnit: 'J',
+        variables: [
+          { key: 'm', label: 'Mass (m)', min: 1, max: 40, step: 1, default: 4, unit: 'kg' },
+          { key: 'v', label: 'Velocity (v)', min: 1, max: 30, step: 1, default: 6, unit: 'm/s' }
+        ],
+        compute: (v) => 0.5 * v.m * (v.v * v.v),
+        graphFn: (v, x) => 0.5 * v.m * (x * x), // y=KE, x=v
+        graphXLabel: 'Velocity (m/s)',
+        graphYLabel: 'Kinetic Energy (J)',
+        explainer: {
+          beginner: "Energy of a moving object. Because velocity is squared, doubling your speed quadruples the kinetic energy!",
+          school: "Work-energy theorem: Work done on a body equals change in kinetic energy: W = ΔKE = ∫ F·dx = ½mv².",
+          advanced: "Non-relativistic limit of Einstein's equation: E_k = (γ - 1)mc² ≈ ½mv² for v << c.",
+          sensitivity: "Doubling velocity quadruples (4×) kinetic energy, while doubling mass only doubles (2×) it."
+        },
+        simType: 'kinetic_shock',
+        svgIcon: `<svg viewBox="0 0 100 60" class="w-full h-full"><circle cx="45" cy="30" r="14" fill="#6366f1" stroke="#818cf8"/><circle cx="45" cy="30" r="22" fill="none" stroke="#a855f7" stroke-dasharray="3,3"/><path d="M60 22 L85 10 M60 38 L85 50" stroke="#f43f5e" stroke-width="2"/></svg>`
+      },
+      {
+        id: 'f-gravity',
+        title: 'Universal Gravitation',
+        formula: 'F = G(m₁m₂)/r²',
+        category: 'space',
+        subject: 'Astrophysics',
+        difficulty: 'Intermediate',
+        resultLabel: 'Gravitational Force',
+        resultUnit: 'N',
+        variables: [
+          { key: 'm1', label: 'Mass 1 (m₁)', min: 10, max: 200, step: 5, default: 50, unit: '×10²² kg' },
+          { key: 'm2', label: 'Mass 2 (m₂)', min: 10, max: 200, step: 5, default: 20, unit: '×10²² kg' },
+          { key: 'r', label: 'Distance (r)', min: 2, max: 40, step: 1, default: 10, unit: '×10⁶ m' }
+        ],
+        compute: (v) => (6.674 * v.m1 * v.m2) / (v.r * v.r),
+        graphFn: (v, x) => (6.674 * v.m1 * v.m2) / (x * x), // y=F, x=r
+        graphXLabel: 'Separation Distance (r)',
+        graphYLabel: 'Gravitational Force (N)',
+        explainer: {
+          beginner: "Every mass attracts every other mass. The bigger they are, the stronger the pull. The farther apart, the weaker it gets.",
+          school: "Newton's inverse-square law: gravitational force decays with distance squared (1/r²).",
+          advanced: "Weak-field static limit of General Relativity's field equations G_μν = (8πG/c⁴)T_μν.",
+          sensitivity: "Doubling the distance reduces gravitational pull to 25% of its original strength."
+        },
+        simType: 'two_body_orbit',
+        svgIcon: `<svg viewBox="0 0 100 60" class="w-full h-full"><circle cx="30" cy="30" r="12" fill="#0284c7" stroke="#38bdf8"/><circle cx="75" cy="30" r="7" fill="#f59e0b" stroke="#fbbf24"/><path d="M44 30 L64 30 M60 26 L64 30 L60 34 M48 26 L44 30 L48 34" stroke="#e2e8f0" stroke-width="1.5"/></svg>`
+      },
+      {
+        id: 'v-ir',
+        title: "Ohm's Law",
+        formula: 'V = IR',
+        category: 'physics',
+        subject: 'Electromagnetism',
+        difficulty: 'Fundamental',
+        resultLabel: 'Voltage Drop (V)',
+        resultUnit: 'V',
+        variables: [
+          { key: 'I', label: 'Current (I)', min: 0.1, max: 10, step: 0.1, default: 2.5, unit: 'A' },
+          { key: 'R', label: 'Resistance (R)', min: 1, max: 50, step: 1, default: 8, unit: 'Ω' }
+        ],
+        compute: (v) => v.I * v.R,
+        graphFn: (v, x) => x * v.R, // y=V, x=I
+        graphXLabel: 'Current (A)',
+        graphYLabel: 'Voltage (V)',
+        explainer: {
+          beginner: "Voltage is the electrical pressure. It equals the flow rate (current) multiplied by how hard the wire resists the flow.",
+          school: "Linear macroscopic conduction in ohmic materials. Slope of V vs. I gives resistance R.",
+          advanced: "Microscopic form: J = σE, where current density J is proportional to electric field E and conductivity σ.",
+          sensitivity: "Higher resistance requires proportionally higher voltage to push the same current."
+        },
+        simType: 'ohm_circuit',
+        svgIcon: `<svg viewBox="0 0 100 60" class="w-full h-full"><rect x="15" y="15" width="70" height="30" fill="none" stroke="#38bdf8" stroke-width="2"/><path d="M40 15 L43 10 L48 20 L53 10 L58 20 L61 15" stroke="#f59e0b" stroke-width="2" fill="none"/><line x1="25" y1="26" x2="25" y2="34" stroke="#10b981" stroke-width="3"/></svg>`
+      },
+      {
+        id: 'pv-nrt',
+        title: 'Ideal Gas Law',
+        formula: 'PV = nRT',
+        category: 'chemistry',
+        subject: 'Thermodynamics',
+        difficulty: 'Intermediate',
+        resultLabel: 'Pressure (P)',
+        resultUnit: 'kPa',
+        variables: [
+          { key: 'n', label: 'Moles (n)', min: 0.5, max: 10, step: 0.5, default: 2, unit: 'mol' },
+          { key: 'T', label: 'Temperature (T)', min: 100, max: 600, step: 10, default: 300, unit: 'K' },
+          { key: 'V', label: 'Volume (V)', min: 1, max: 20, step: 0.5, default: 5, unit: 'L' }
+        ],
+        compute: (v) => (v.n * 8.314 * v.T) / v.V,
+        graphFn: (v, x) => (v.n * 8.314 * v.T) / x, // y=P, x=V
+        graphXLabel: 'Volume (L)',
+        graphYLabel: 'Pressure (kPa)',
+        explainer: {
+          beginner: "In an airtight container, heating the gas increases pressure, while squeezing it into a smaller volume also increases pressure.",
+          school: "Equation of state for ideal gases combining Boyle's, Charles's, and Avogadro's laws.",
+          advanced: "Statistical mechanical derivation from partition function for non-interacting point particles.",
+          sensitivity: "Halving the volume doubles the pressure (isothermal compression)."
+        },
+        simType: 'gas_chamber',
+        svgIcon: `<svg viewBox="0 0 100 60" class="w-full h-full"><rect x="20" y="10" width="60" height="40" rx="3" fill="none" stroke="#38bdf8" stroke-width="2"/><circle cx="35" cy="25" r="3" fill="#f43f5e"/><circle cx="50" cy="35" r="3" fill="#f43f5e"/><circle cx="65" cy="20" r="3" fill="#f43f5e"/><circle cx="40" cy="40" r="3" fill="#f43f5e"/></svg>`
+      }
+    ];
+
+    /* =========================================================================
+       2. STATE VARIABLES
+       ========================================================================= */
+    let currentEq = EQUATION_PRESETS[0];
+    let currentVariables = { m: 5, a: 4 };
+    let currentExplainerLvl = 'beginner';
+    let graphZoom = 1.0;
+    let compareMode = false;
+    let activeCategory = 'all';
+    let challengeScore = 0;
+
+    /* =========================================================================
+       3. NAVIGATION LOGIC
+       ========================================================================= */
+    window.switchNavTab = function(tabId) {
+      // Hide all views
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      
+      // Unhide target view
+      const targetView = document.getElementById('view-' + tabId);
+      if (targetView) targetView.classList.remove('hidden');
+
+      // Update nav button active states
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('bg-sky-500/20', 'text-sky-300', 'border-sky-500/50', 'badge-glow');
+        btn.classList.add('text-slate-300', 'border-transparent');
+      });
+
+      const activeBtn = document.getElementById('nav-' + tabId);
+      if (activeBtn) {
+        activeBtn.classList.remove('text-slate-300', 'border-transparent');
+        activeBtn.classList.add('bg-sky-500/20', 'text-sky-300', 'border-sky-500/50', 'badge-glow');
+      }
+
+      // Initialize specific views on first open
+      if (tabId === 'explorer-3d') initThreeJSScene();
+      if (tabId === 'virtual-labs') initVirtualLabCanvas();
+      if (tabId === 'space-orrery') initSpaceOrrery();
+    };
+
+    /* =========================================================================
+       4. EQUATION PLAYGROUND CONTROLLERS
+       ========================================================================= */
+    function loadEquation(eqId) {
+      const found = EQUATION_PRESETS.find(e => e.id === eqId);
+      if (!found) return;
+
+      currentEq = found;
+      currentVariables = {};
+      currentEq.variables.forEach(v => {
+        currentVariables[v.key] = v.default;
+      });
+
+      // Update UI Header
+      document.getElementById('active-eq-title').innerText = currentEq.title;
+      document.getElementById('active-eq-formula').innerText = currentEq.formula;
+      document.getElementById('active-eq-category').innerText = currentEq.category.toUpperCase() + ' MODEL';
+      document.getElementById('active-result-label').innerText = currentEq.resultLabel;
+      document.getElementById('active-result-unit').innerText = currentEq.resultUnit;
+      document.getElementById('graph-eq-label').innerText = currentEq.formula + ' curve';
+
+      // Build Sliders
+      renderVariableSliders();
+      updateCalculations();
+      renderExplainer();
+
+      // Scroll smoothly to workstation if on mobile
+      if (window.innerWidth < 768) {
+        window.scrollTo({ top: 180, behavior: 'smooth' });
+      }
+    }
+
+    function renderVariableSliders() {
+      const container = document.getElementById('variables-container');
+      container.innerHTML = '';
+
+      currentEq.variables.forEach(v => {
+        const row = document.createElement('div');
+        row.className = 'p-3 rounded-xl bg-sci-card/60 border border-sci-border/70 space-y-2';
+        
+        row.innerHTML = `
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-semibold text-slate-200">${v.label}</span>
+            <div class="flex items-center space-x-1 font-mono font-bold text-sky-400">
+              <span id="readout-${v.key}">${currentVariables[v.key]}</span>
+              <span class="text-slate-400 text-[10px]">${v.unit}</span>
+            </div>
+          </div>
+          <input type="range" 
+            min="${v.min}" 
+            max="${v.max}" 
+            step="${v.step}" 
+            value="${currentVariables[v.key]}" 
+            id="slider-${v.key}" 
+            oninput="handleSliderChange('${v.key}', this.value)"
+            class="w-full">
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    window.handleSliderChange = function(key, val) {
+      currentVariables[key] = parseFloat(val);
+      const readout = document.getElementById('readout-' + key);
+      if (readout) readout.innerText = currentVariables[key];
+      updateCalculations();
+    };
+
+    function updateCalculations() {
+      const result = currentEq.compute(currentVariables);
+      const resultEl = document.getElementById('active-result-val');
+      if (resultEl) {
+        resultEl.innerText = result >= 1000 ? result.toFixed(1) : result.toFixed(2);
+      }
+
+      // Update simulation HUD
+      const hud = document.getElementById('sim-hud-overlay');
+      if (hud) {
+        let parts = [];
+        for (let k in currentVariables) {
+          parts.push(`${k}: ${currentVariables[k]}`);
+        }
+        parts.push(`Result: ${result.toFixed(1)} ${currentEq.resultUnit}`);
+        hud.innerText = parts.join(' | ');
+      }
+
+      // Redraw live graph immediately
+      drawCartesianGraph();
+
+      if (compareMode) updateCompareB();
+    }
+
+    window.resetCurrentVariables = function() {
+      currentEq.variables.forEach(v => {
+        currentVariables[v.key] = v.default;
+        const slider = document.getElementById('slider-' + v.key);
+        if (slider) slider.value = v.default;
+        const readout = document.getElementById('readout-' + v.key);
+        if (readout) readout.innerText = v.default;
+      });
+      updateCalculations();
+    };
+
+    window.setExplainerLevel = function(lvl) {
+      currentExplainerLvl = lvl;
+      ['beginner', 'school', 'advanced'].forEach(l => {
+        const btn = document.getElementById('exp-lvl-' + l);
+        if (btn) {
+          if (l === lvl) {
+            btn.className = 'px-2 py-0.5 rounded text-sky-300 font-semibold bg-sky-500/20';
+          } else {
+            btn.className = 'px-2 py-0.5 rounded text-slate-400 hover:text-white';
+          }
+        }
+      });
+      renderExplainer();
+    };
+
+    function renderExplainer() {
+      const textEl = document.getElementById('explainer-text');
+      const sensEl = document.getElementById('explainer-sensitivity');
+      if (textEl && currentEq.explainer) {
+        textEl.innerText = currentEq.explainer[currentExplainerLvl] || currentEq.explainer.beginner;
+      }
+      if (sensEl && currentEq.explainer) {
+        sensEl.innerText = currentEq.explainer.sensitivity;
+      }
+    }
+
+    function renderEquationLibrary() {
+      const grid = document.getElementById('equation-library-grid');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      const query = (document.getElementById('eq-search-input')?.value || '').toLowerCase();
+
+      const filtered = EQUATION_PRESETS.filter(eq => {
+        const matchesCat = activeCategory === 'all' || eq.category === activeCategory;
+        const matchesQuery = eq.title.toLowerCase().includes(query) || 
+                             eq.formula.toLowerCase().includes(query) || 
+                             eq.subject.toLowerCase().includes(query);
+        return matchesCat && matchesQuery;
+      });
+
+      document.getElementById('eq-count-badge').innerText = `${filtered.length} Presets`;
+
+      filtered.forEach(eq => {
+        const card = document.createElement('div');
+        card.className = `p-4 rounded-xl glass-panel border border-slate-700/60 hover:border-sky-400/60 transition cursor-pointer flex flex-col justify-between group ${eq.id === currentEq.id ? 'border-sky-400/80 bg-sky-950/20' : ''}`;
+        card.onclick = () => loadEquation(eq.id);
+
+        card.innerHTML = `
+          <div>
+            <div class="flex items-center justify-between text-[10px] font-mono text-slate-400 mb-1.5">
+              <span class="uppercase text-sky-400 font-bold">${eq.category}</span>
+              <span class="px-1.5 py-0.2 rounded bg-sci-card border border-sci-border">${eq.difficulty}</span>
+            </div>
+            
+            <div class="flex items-center justify-between">
+              <h3 class="text-sm font-bold text-white group-hover:text-sky-300 transition">${eq.title}</h3>
+              <span class="text-xs font-mono font-bold text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/30">${eq.formula}</span>
+            </div>
+
+            <!-- Picture / Vector Schematic -->
+            <div class="w-full h-24 my-3 bg-sci-dark/80 rounded-lg p-2 border border-sci-border/60 flex items-center justify-center overflow-hidden">
+              ${eq.svgIcon}
+            </div>
+
+            <p class="text-[11px] text-slate-400 line-clamp-2">${eq.explainer.beginner}</p>
+          </div>
+
+          <button class="w-full mt-3 py-1.5 rounded-lg bg-sci-card hover:bg-sky-500/20 group-hover:border-sky-500/40 border border-sci-border text-xs text-sky-300 font-semibold transition text-center">
+            Open Experiment →
+          </button>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    window.filterEquations = function() {
+      renderEquationLibrary();
+    };
+
+    window.setEqCategory = function(cat) {
+      activeCategory = cat;
+      ['all', 'physics', 'space', 'math', 'chemistry'].forEach(c => {
+        const b = document.getElementById('btn-cat-' + c);
+        if (b) {
+          if (c === cat) {
+            b.className = 'eq-cat-btn px-2.5 py-1 rounded-md text-xs font-semibold bg-sky-500 text-slate-950';
+          } else {
+            b.className = 'eq-cat-btn px-2.5 py-1 rounded-md text-xs font-semibold bg-sci-card text-slate-300 hover:text-white';
+          }
+        }
+      });
+      renderEquationLibrary();
+    };
+
+    /* =========================================================================
+       5. PHYSICAL SIMULATION ENGINE (2D Canvas 60 FPS)
+       ========================================================================= */
+    const simCanvas = document.getElementById('canvas-physics-sim');
+    const simCtx = simCanvas ? simCanvas.getContext('2d') : null;
+    let simTime = 0;
+    let simPaused = false;
+    let simSpeedMultiplier = 1.0;
+
+    function resizeSimCanvas() {
+      if (!simCanvas) return;
+      const parent = simCanvas.parentElement;
+      const targetW = parent && parent.clientWidth > 40 ? parent.clientWidth : 600;
+      const targetH = parent && parent.clientHeight > 40 ? parent.clientHeight : 256;
+      if (simCanvas.width !== targetW || simCanvas.height !== targetH) {
+        simCanvas.width = targetW;
+        simCanvas.height = targetH;
+      }
+    }
+    window.addEventListener('resize', () => {
+      resizeSimCanvas();
+      resizeGraphCanvas();
+      drawCartesianGraph();
+    });
+
+    window.toggleSimPause = function() {
+      simPaused = !simPaused;
+      const btn = document.getElementById('btn-sim-pause');
+      const badge = document.getElementById('sim-status-badge');
+      if (simPaused) {
+        if (btn) btn.innerText = '▶ Play';
+        if (badge) {
+          badge.innerText = 'PAUSED';
+          badge.className = 'text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40';
+        }
+      } else {
+        if (btn) btn.innerText = '⏸ Pause';
+        if (badge) {
+          badge.innerText = '60 FPS ACTIVE';
+          badge.className = 'text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40';
+        }
+      }
+    };
+
+    window.cycleSimSpeed = function() {
+      const speeds = [0.5, 1.0, 2.0];
+      const idx = speeds.indexOf(simSpeedMultiplier);
+      simSpeedMultiplier = speeds[(idx + 1) % speeds.length];
+      const btn = document.getElementById('btn-sim-speed');
+      if (btn) btn.innerText = `${simSpeedMultiplier.toFixed(1)}×`;
+    };
+
+    function runPhysicsSimulationLoop() {
+      if (!simCanvas || !simCtx) {
+        requestAnimationFrame(runPhysicsSimulationLoop);
+        return;
+      }
+
+      resizeSimCanvas();
+      const w = simCanvas.width;
+      const h = simCanvas.height;
+
+      simCtx.fillStyle = '#070b14';
+      simCtx.fillRect(0, 0, w, h);
+
+      // Draw subtle background grid
+      simCtx.strokeStyle = 'rgba(30, 41, 59, 0.45)';
+      simCtx.lineWidth = 1;
+      const gridSize = 30;
+      for (let x = 0; x < w; x += gridSize) {
+        simCtx.beginPath(); simCtx.moveTo(x, 0); simCtx.lineTo(x, h); simCtx.stroke();
+      }
+      for (let y = 0; y < h; y += gridSize) {
+        simCtx.beginPath(); simCtx.moveTo(0, y); simCtx.lineTo(w, y); simCtx.stroke();
+      }
+
+      if (!simPaused) {
+        simTime += 0.03 * simSpeedMultiplier;
+      }
+
+      // Render simulation based on active model
+      if (currentEq.simType === 'newton_cart') {
+        drawNewtonCartSim(w, h);
+      } else if (currentEq.simType === 'two_body_orbit') {
+        drawTwoBodyOrbitSim(w, h);
+      } else if (currentEq.simType === 'ohm_circuit') {
+        drawOhmCircuitSim(w, h);
+      } else if (currentEq.simType === 'gas_chamber') {
+        drawGasChamberSim(w, h);
+      } else if (currentEq.simType === 'kinetic_shock') {
+        drawKineticShockSim(w, h);
+      } else {
+        drawKinematicTrailSim(w, h);
+      }
+
+      requestAnimationFrame(runPhysicsSimulationLoop);
+    }
+
+    function drawNewtonCartSim(w, h) {
+      const groundY = h * 0.72;
+      simCtx.strokeStyle = '#38bdf8';
+      simCtx.lineWidth = 2;
+      simCtx.beginPath();
+      simCtx.moveTo(20, groundY);
+      simCtx.lineTo(w - 20, groundY);
+      simCtx.stroke();
+
+      const mass = currentVariables.m || 5;
+      const accel = currentVariables.a || 4;
+      const force = mass * accel;
+
+      // Cart dimensions dynamically scale with mass
+      const cartW = Math.min(120, 50 + mass * 1.5);
+      const cartH = Math.min(60, 28 + mass * 0.6);
+      
+      // Moving cart with acceleration dynamics
+      const cycle = (simTime * (accel * 0.4)) % Math.max(80, w - cartW - 80);
+      const cartX = 40 + cycle;
+      const cartY = groundY - cartH - 8;
+
+      // Cart body gradient
+      const grad = simCtx.createLinearGradient(cartX, cartY, cartX, cartY + cartH);
+      grad.addColorStop(0, '#0284c7');
+      grad.addColorStop(1, '#075985');
+      simCtx.fillStyle = grad;
+      simCtx.fillRect(cartX, cartY, cartW, cartH);
+      simCtx.strokeStyle = '#38bdf8';
+      simCtx.lineWidth = 1.5;
+      simCtx.strokeRect(cartX, cartY, cartW, cartH);
+
+      // Mass label on cart
+      simCtx.fillStyle = '#ffffff';
+      simCtx.font = 'bold 11px monospace';
+      simCtx.fillText(`${mass.toFixed(1)} kg`, cartX + 8, cartY + cartH / 2 + 4);
+
+      // Wheels
+      simCtx.fillStyle = '#0f172a';
+      simCtx.strokeStyle = '#38bdf8';
+      simCtx.beginPath(); simCtx.arc(cartX + 15, groundY - 4, 7, 0, Math.PI * 2); simCtx.fill(); simCtx.stroke();
+      simCtx.beginPath(); simCtx.arc(cartX + cartW - 15, groundY - 4, 7, 0, Math.PI * 2); simCtx.fill(); simCtx.stroke();
+
+      // Force Vector Arrow (proportional to force)
+      const arrowLen = Math.min(force * 2.2, 130);
+      simCtx.strokeStyle = '#f59e0b';
+      simCtx.lineWidth = 3;
+      simCtx.beginPath();
+      simCtx.moveTo(cartX + cartW, cartY + cartH / 2);
+      simCtx.lineTo(cartX + cartW + arrowLen, cartY + cartH / 2);
+      simCtx.stroke();
+
+      // Arrowhead
+      simCtx.fillStyle = '#f59e0b';
+      simCtx.beginPath();
+      simCtx.moveTo(cartX + cartW + arrowLen + 8, cartY + cartH / 2);
+      simCtx.lineTo(cartX + cartW + arrowLen, cartY + cartH / 2 - 5);
+      simCtx.lineTo(cartX + cartW + arrowLen, cartY + cartH / 2 + 5);
+      simCtx.fill();
+
+      // Force readout label above vector
+      simCtx.fillStyle = '#f59e0b';
+      simCtx.font = '10px monospace';
+      simCtx.fillText(`F = ${force.toFixed(1)} N`, cartX + cartW + 10, cartY + cartH / 2 - 8);
+    }
+
+    function drawKineticShockSim(w, h) {
+      const cx = w / 2;
+      const cy = h / 2;
+      const mass = currentVariables.m || 4;
+      const vel = currentVariables.v || 6;
+      const ke = 0.5 * mass * vel * vel;
+
+      // Expanding energy wave
+      const shockR = (simTime * 40) % 80;
+      simCtx.strokeStyle = 'rgba(99, 102, 241, ' + (1 - shockR / 80) + ')';
+      simCtx.lineWidth = 3;
+      simCtx.beginPath();
+      simCtx.arc(cx, cy, shockR + 10, 0, Math.PI * 2);
+      simCtx.stroke();
+
+      // Core kinetic particle
+      const radius = 12 + mass * 0.8;
+      simCtx.fillStyle = '#6366f1';
+      simCtx.beginPath();
+      simCtx.arc(cx, cy, radius, 0, Math.PI * 2);
+      simCtx.fill();
+      simCtx.strokeStyle = '#a5b4fc';
+      simCtx.lineWidth = 2;
+      simCtx.stroke();
+
+      // Velocity vectors radiating out
+      simCtx.fillStyle = '#ffffff';
+      simCtx.font = 'bold 11px monospace';
+      simCtx.fillText(`KE = ${ke.toFixed(1)} J`, cx - 35, cy - radius - 10);
+      simCtx.fillStyle = '#38bdf8';
+      simCtx.fillText(`v = ${vel.toFixed(1)} m/s`, cx - 25, cy + radius + 20);
+    }
+    window.addEventListener('resize', resizeSimCanvas);
+
+    function runPhysicsSimulationLoop() {
+      resizeSimCanvas();
+      const w = simCanvas.width;
+      const h = simCanvas.height;
+
+      simCtx.fillStyle = '#070b14';
+      simCtx.fillRect(0, 0, w, h);
+
+      // Draw subtle background grid
+      simCtx.strokeStyle = 'rgba(30, 41, 59, 0.4)';
+      simCtx.lineWidth = 1;
+      const gridSize = 30;
+      for (let x = 0; x < w; x += gridSize) {
+        simCtx.beginPath(); simCtx.moveTo(x, 0); simCtx.lineTo(x, h); simCtx.stroke();
+      }
+      for (let y = 0; y < h; y += gridSize) {
+        simCtx.beginPath(); simCtx.moveTo(0, y); simCtx.lineTo(w, y); simCtx.stroke();
+      }
+
+      simTime += 0.03;
+
+      // Render simulation based on active model
+      if (currentEq.simType === 'newton_cart') {
+        drawNewtonCartSim(w, h);
+      } else if (currentEq.simType === 'two_body_orbit') {
+        drawTwoBodyOrbitSim(w, h);
+      } else if (currentEq.simType === 'ohm_circuit') {
+        drawOhmCircuitSim(w, h);
+      } else if (currentEq.simType === 'gas_chamber') {
+        drawGasChamberSim(w, h);
+      } else {
+        drawKinematicTrailSim(w, h);
+      }
+
+      requestAnimationFrame(runPhysicsSimulationLoop);
+    }
+
+    function drawNewtonCartSim(w, h) {
+      const groundY = h * 0.72;
+      simCtx.strokeStyle = '#38bdf8';
+      simCtx.lineWidth = 2;
+      simCtx.beginPath();
+      simCtx.moveTo(20, groundY);
+      simCtx.lineTo(w - 20, groundY);
+      simCtx.stroke();
+
+      const mass = currentVariables.m || 5;
+      const accel = currentVariables.a || 4;
+      const force = mass * accel;
+
+      // Cart size scales with mass
+      const cartW = 50 + mass * 1.5;
+      const cartH = 30 + mass * 0.6;
+      
+      // Cart oscillating or traversing with accel
+      const cycle = (simTime * (accel * 0.4)) % (w - cartW - 80);
+      const cartX = 40 + cycle;
+      const cartY = groundY - cartH - 8;
+
+      // Cart body
+      simCtx.fillStyle = '#0284c7';
+      simCtx.fillRect(cartX, cartY, cartW, cartH);
+      simCtx.strokeStyle = '#38bdf8';
+      simCtx.strokeRect(cartX, cartY, cartW, cartH);
+
+      // Mass label
+      simCtx.fillStyle = '#ffffff';
+      simCtx.font = '10px monospace';
+      simCtx.fillText(`${mass.toFixed(1)} kg`, cartX + 10, cartY + cartH / 2 + 3);
+
+      // Wheels
+      simCtx.fillStyle = '#0f172a';
+      simCtx.beginPath(); simCtx.arc(cartX + 15, groundY - 4, 7, 0, Math.PI * 2); simCtx.fill(); simCtx.stroke();
+      simCtx.beginPath(); simCtx.arc(cartX + cartW - 15, groundY - 4, 7, 0, Math.PI * 2); simCtx.fill(); simCtx.stroke();
+
+      // Force Vector Arrow (scales with force)
+      const arrowLen = Math.min(force * 2.2, 120);
+      simCtx.strokeStyle = '#f59e0b';
+      simCtx.lineWidth = 3;
+      simCtx.beginPath();
+      simCtx.moveTo(cartX + cartW, cartY + cartH / 2);
+      simCtx.lineTo(cartX + cartW + arrowLen, cartY + cartH / 2);
+      simCtx.stroke();
+
+      // Arrowhead
+      simCtx.fillStyle = '#f59e0b';
+      simCtx.beginPath();
+      simCtx.moveTo(cartX + cartW + arrowLen + 8, cartY + cartH / 2);
+      simCtx.lineTo(cartX + cartW + arrowLen, cartY + cartH / 2 - 5);
+      simCtx.lineTo(cartX + cartW + arrowLen, cartY + cartH / 2 + 5);
+      simCtx.fill();
+
+      // Vector text
+      simCtx.fillStyle = '#f59e0b';
+      simCtx.fillText(`F = ${force.toFixed(1)} N`, cartX + cartW + 10, cartY + cartH / 2 - 8);
+    }
+
+    function drawTwoBodyOrbitSim(w, h) {
+      const cx = w / 2;
+      const cy = h / 2;
+      const r = (currentVariables.r || 10) * 4.5;
+      const ang = simTime * 0.8;
+
+      // Orbit circle
+      simCtx.strokeStyle = 'rgba(56, 189, 248, 0.2)';
+      simCtx.setLineDash([4, 4]);
+      simCtx.beginPath();
+      simCtx.arc(cx, cy, r, 0, Math.PI * 2);
+      simCtx.stroke();
+      simCtx.setLineDash([]);
+
+      // Central Body m1
+      const rad1 = Math.min(22, 10 + (currentVariables.m1 || 50) * 0.1);
+      simCtx.fillStyle = '#0284c7';
+      simCtx.beginPath(); simCtx.arc(cx, cy, rad1, 0, Math.PI * 2); simCtx.fill();
+      simCtx.strokeStyle = '#38bdf8'; simCtx.stroke();
+
+      // Orbiting Body m2
+      const x2 = cx + Math.cos(ang) * r;
+      const y2 = cy + Math.sin(ang) * r;
+      const rad2 = Math.min(14, 6 + (currentVariables.m2 || 20) * 0.1);
+      simCtx.fillStyle = '#f59e0b';
+      simCtx.beginPath(); simCtx.arc(x2, y2, rad2, 0, Math.PI * 2); simCtx.fill();
+
+      // Force attraction vector
+      simCtx.strokeStyle = '#10b981';
+      simCtx.lineWidth = 1.5;
+      simCtx.beginPath(); simCtx.moveTo(x2, y2); simCtx.lineTo(cx, cy); simCtx.stroke();
+    }
+
+    function drawOhmCircuitSim(w, h) {
+      const cx = w / 2;
+      const cy = h / 2;
+      const bw = Math.min(w * 0.7, 240);
+      const bh = Math.min(h * 0.6, 110);
+
+      simCtx.strokeStyle = '#38bdf8';
+      simCtx.lineWidth = 2;
+      simCtx.strokeRect(cx - bw / 2, cy - bh / 2, bw, bh);
+
+      // Resistor zig-zag on top wire
+      simCtx.fillStyle = '#070b14';
+      simCtx.fillRect(cx - 30, cy - bh / 2 - 8, 60, 16);
+      simCtx.strokeStyle = '#f59e0b';
+      simCtx.beginPath();
+      simCtx.moveTo(cx - 30, cy - bh / 2);
+      simCtx.lineTo(cx - 20, cy - bh / 2 - 6);
+      simCtx.lineTo(cx - 10, cy - bh / 2 + 6);
+      simCtx.lineTo(cx, cy - bh / 2 - 6);
+      simCtx.lineTo(cx + 10, cy - bh / 2 + 6);
+      simCtx.lineTo(cx + 20, cy - bh / 2 - 6);
+      simCtx.lineTo(cx + 30, cy - bh / 2);
+      simCtx.stroke();
+
+      // Electrons moving with current I
+      const current = currentVariables.I || 2.5;
+      const speed = current * 2.5;
+      const electronDist = (simTime * speed * 25) % (bw * 2 + bh * 2);
+
+      simCtx.fillStyle = '#00f2fe';
+      for (let i = 0; i < 8; i++) {
+        const offset = (electronDist + i * 40) % (bw * 2 + bh * 2);
+        let ex, ey;
+        if (offset < bw) {
+          ex = cx - bw / 2 + offset; ey = cy - bh / 2;
+        } else if (offset < bw + bh) {
+          ex = cx + bw / 2; ey = cy - bh / 2 + (offset - bw);
+        } else if (offset < bw * 2 + bh) {
+          ex = cx + bw / 2 - (offset - (bw + bh)); ey = cy + bh / 2;
+        } else {
+          ex = cx - bw / 2; ey = cy + bh / 2 - (offset - (bw * 2 + bh));
+        }
+        simCtx.beginPath(); simCtx.arc(ex, ey, 3, 0, Math.PI * 2); simCtx.fill();
+      }
+    }
+
+    function drawGasChamberSim(w, h) {
+      const cx = w / 2;
+      const cy = h / 2;
+      const chW = 200;
+      const chH = 120;
+
+      simCtx.strokeStyle = '#38bdf8';
+      simCtx.lineWidth = 2;
+      simCtx.strokeRect(cx - chW / 2, cy - chH / 2, chW, chH);
+
+      const moles = currentVariables.n || 2;
+      const temp = currentVariables.T || 300;
+      const numParticles = Math.floor(moles * 12);
+      const vel = (temp / 300) * 1.5;
+
+      simCtx.fillStyle = '#f43f5e';
+      for (let i = 0; i < numParticles; i++) {
+        const px = cx - chW / 2 + 10 + ((i * 37 + simTime * vel * 40) % (chW - 20));
+        const py = cy - chH / 2 + 10 + ((i * 53 + Math.sin(simTime * 2 + i) * 30 + 40) % (chH - 20));
+        simCtx.beginPath(); simCtx.arc(px, py, 3, 0, Math.PI * 2); simCtx.fill();
+      }
+    }
+
+    function drawKinematicTrailSim(w, h) {
+      const cx = 50 + (simTime * 60) % (w - 100);
+      const cy = h / 2;
+
+      simCtx.fillStyle = '#38bdf8';
+      simCtx.beginPath(); simCtx.arc(cx, cy, 12, 0, Math.PI * 2); simCtx.fill();
+      
+      simCtx.strokeStyle = 'rgba(56, 189, 248, 0.4)';
+      simCtx.lineWidth = 2;
+      simCtx.beginPath();
+      simCtx.moveTo(cx - 40, cy);
+      simCtx.lineTo(cx, cy);
+      simCtx.stroke();
+    }
+
+    /* =========================================================================
+       6. CARTESIAN GRAPH CANVAS ENGINE
+       ========================================================================= */
+    const graphCanvas = document.getElementById('canvas-live-graph');
+    const gCtx = graphCanvas.getContext('2d');
+
+    function resizeGraphCanvas() {
+      if (!graphCanvas) return;
+      graphCanvas.width = graphCanvas.parentElement.clientWidth;
+      graphCanvas.height = graphCanvas.parentElement.clientHeight;
+    }
+
+    function drawCartesianGraph() {
+      resizeGraphCanvas();
+      const w = graphCanvas.width;
+      const h = graphCanvas.height;
+
+      gCtx.fillStyle = '#070b14';
+      gCtx.fillRect(0, 0, w, h);
+
+      const ox = 50; // origin X
+      const oy = h - 35; // origin Y
+
+      // Draw Grid Lines & Ticks
+      gCtx.strokeStyle = 'rgba(30, 41, 59, 0.6)';
+      gCtx.lineWidth = 1;
+      for (let x = ox; x < w; x += 40) {
+        gCtx.beginPath(); gCtx.moveTo(x, 15); gCtx.lineTo(x, oy); gCtx.stroke();
+      }
+      for (let y = oy; y > 15; y -= 30) {
+        gCtx.beginPath(); gCtx.moveTo(ox, y); gCtx.lineTo(w - 15, y); gCtx.stroke();
+      }
+
+      // Main Axes
+      gCtx.strokeStyle = '#38bdf8';
+      gCtx.lineWidth = 1.5;
+      gCtx.beginPath();
+      gCtx.moveTo(ox, 15); gCtx.lineTo(ox, oy); gCtx.lineTo(w - 15, oy);
+      gCtx.stroke();
+
+      // Axis Labels
+      gCtx.fillStyle = '#94a3b8';
+      gCtx.font = '10px monospace';
+      gCtx.fillText(currentEq.graphXLabel || 'x', w - 80, oy + 25);
+      gCtx.fillText(currentEq.graphYLabel || 'y', 8, 25);
+
+      // Plot Main Curve
+      const maxRangeX = 25 * graphZoom;
+      const scaleX = (w - ox - 30) / maxRangeX;
+      const scaleY = (oy - 30) / 120;
+
+      gCtx.strokeStyle = '#00f2fe';
+      gCtx.lineWidth = 2.5;
+      gCtx.beginPath();
+
+      let firstPoint = true;
+      for (let xVal = 0.5; xVal <= maxRangeX; xVal += 0.5) {
+        const yVal = currentEq.graphFn(currentVariables, xVal);
+        const px = ox + xVal * scaleX;
+        const py = oy - Math.min(yVal * scaleY, oy - 20);
+
+        if (firstPoint) {
+          gCtx.moveTo(px, py); firstPoint = false;
+        } else {
+          gCtx.lineTo(px, py);
+        }
+      }
+      gCtx.stroke();
+
+      // Plot Operating Point Dot
+      const activeX = currentVariables.a || currentVariables.t || currentVariables.v || currentVariables.I || 5;
+      const activeY = currentEq.compute(currentVariables);
+      const dotPx = ox + activeX * scaleX;
+      const dotPy = oy - Math.min(activeY * scaleY, oy - 20);
+
+      gCtx.fillStyle = '#f59e0b';
+      gCtx.beginPath(); gCtx.arc(dotPx, dotPy, 5, 0, Math.PI * 2); gCtx.fill();
+      gCtx.strokeStyle = '#ffffff'; gCtx.lineWidth = 1.5; gCtx.stroke();
+
+      gCtx.fillStyle = '#f59e0b';
+      gCtx.fillText(`(${activeX.toFixed(1)}, ${activeY.toFixed(1)})`, dotPx + 8, dotPy - 6);
+    }
+
+    window.zoomGraph = function(factor) {
+      graphZoom *= factor;
+      drawCartesianGraph();
+    };
+
+    window.resetGraphZoom = function() {
+      graphZoom = 1.0;
+      drawCartesianGraph();
+    };
+
+    /* =========================================================================
+       7. COMPARE MODE & CHALLENGE SYSTEM
+       ========================================================================= */
+    window.toggleCompareMode = function() {
+      compareMode = !compareMode;
+      const panel = document.getElementById('compare-panel');
+      const btn = document.getElementById('btn-toggle-compare');
+      if (compareMode) {
+        panel.classList.remove('hidden');
+        btn.classList.add('bg-amber-500', 'text-slate-950');
+        updateCompareB();
+      } else {
+        panel.classList.add('hidden');
+        btn.classList.remove('bg-amber-500', 'text-slate-950');
+      }
+    };
+
+    window.updateCompareB = function() {
+      const mult = parseFloat(document.getElementById('compare-multiplier').value || 2.0);
+      document.getElementById('compare-b-readout').innerText = `${mult.toFixed(1)}× Multiplier`;
+
+      const varA = { ...currentVariables };
+      const resA = currentEq.compute(varA);
+
+      // Modified config B
+      const varB = { ...currentVariables };
+      const firstKey = currentEq.variables[0].key;
+      varB[firstKey] = varB[firstKey] * mult;
+      const resB = currentEq.compute(varB);
+
+      // Readout A
+      const boxA = document.getElementById('compare-data-a');
+      boxA.innerHTML = `<div>${currentEq.variables[0].label}: <b>${varA[firstKey]}</b></div><div>Result: <span class="text-sky-300 font-bold">${resA.toFixed(1)} ${currentEq.resultUnit}</span></div>`;
+
+      // Readout Delta
+      const delta = resB - resA;
+      const pct = ((delta / (resA || 1)) * 100).toFixed(1);
+      const deltaBox = document.getElementById('compare-delta-readout');
+      deltaBox.innerHTML = `
+        <div>Config B Result: <b class="text-amber-300">${resB.toFixed(1)} ${currentEq.resultUnit}</b></div>
+        <div>Absolute Change: <b>${delta >= 0 ? '+' : ''}${delta.toFixed(1)} ${currentEq.resultUnit}</b></div>
+        <div class="text-emerald-400 font-bold">Percent Shift: ${pct}%</div>
+      `;
+    };
+
+    window.saveExperimentResult = function() {
+      const res = currentEq.compute(currentVariables);
+      const hud = document.getElementById('sim-hud-overlay');
+      if (hud) {
+        hud.innerText = `[SAVED RUN] ${currentEq.title}: ${res.toFixed(2)} ${currentEq.resultUnit}`;
+      }
+    };
+
+    // Practice Challenge Logic
+    const CHALLENGE_PROBLEMS = [
+      { prompt: "A 5 kg crate is pushed with an acceleration of 3.5 m/s². What is the net force in Newtons (N)?", ans: 17.5, hint: "Use F = m × a directly." },
+      { prompt: "A vehicle accelerates from rest (u=0) at 4 m/s² for 6 seconds. What is the final velocity in m/s?", ans: 24, hint: "Use v = u + at, where u=0." },
+      { prompt: "Calculate kinetic energy for an 8 kg sphere traveling at 5 m/s.", ans: 100, hint: "KE = ½ × m × v² = 0.5 × 8 × 25." },
+      { prompt: "A 12V DC battery is connected across a 4 Ω resistor. What current in Amperes (A) flows?", ans: 3, hint: "Ohm's law: I = V / R." }
+    ];
+    let challengeIndex = 0;
+
+    window.checkChallengeAnswer = function() {
+      const input = parseFloat(document.getElementById('challenge-answer-input').value);
+      const current = CHALLENGE_PROBLEMS[challengeIndex];
+      const feedback = document.getElementById('challenge-feedback');
+      feedback.classList.remove('hidden');
+
+      if (Math.abs(input - current.ans) < 0.1) {
+        challengeScore += 25;
+        document.getElementById('challenge-score').innerText = challengeScore;
+        feedback.className = 'p-2.5 rounded-lg text-xs font-mono bg-emerald-950/60 border border-emerald-500/50 text-emerald-300';
+        feedback.innerText = `✓ Correct! Well calculated (${current.ans}). +25 PTS awarded!`;
+      } else {
+        feedback.className = 'p-2.5 rounded-lg text-xs font-mono bg-rose-950/60 border border-rose-500/50 text-rose-300';
+        feedback.innerText = `✗ Not quite. Double-check your formula and units. Try again or request a hint!`;
+      }
+    };
+
+    window.revealChallengeHint = function() {
+      const hint = document.getElementById('challenge-hint-text');
+      hint.innerText = CHALLENGE_PROBLEMS[challengeIndex].hint;
+      hint.classList.remove('hidden');
+    };
+
+    window.nextChallengeProblem = function() {
+      challengeIndex = (challengeIndex + 1) % CHALLENGE_PROBLEMS.length;
+      document.getElementById('challenge-prompt').innerText = CHALLENGE_PROBLEMS[challengeIndex].prompt;
+      document.getElementById('challenge-answer-input').value = '';
+      document.getElementById('challenge-feedback').classList.add('hidden');
+      document.getElementById('challenge-hint-text').classList.add('hidden');
+    };
+
+    // Custom Formula Builder
+    window.addBuilderToken = function(tok) {
+      const inp = document.getElementById('builder-expr-input');
+      inp.value += ' ' + tok + ' ';
+    };
+
+    window.compileCustomFormula = function() {
+      const expr = document.getElementById('builder-expr-input').value;
+      const status = document.getElementById('builder-status-msg');
+      try {
+        // Safe evaluation test with sample variables
+        const m = 5, a = 4, g = 9.8, h = 10, v = 6, r = 2;
+        const testVal = Function("m", "a", "g", "h", "v", "r", "return " + expr)(m, a, g, h, v, r);
+        status.innerHTML = `<span class="text-emerald-400">✓ Compiled successfully! Sample output: ${testVal}</span>`;
+      } catch (err) {
+        status.innerHTML = `<span class="text-rose-400">✗ Syntax error: check brackets and operators.</span>`;
+      }
+    };
+
+    /* =========================================================================
+       8. COURSES & MASTERY ACADEMY (19 LEVELS)
+       ========================================================================= */
+    const COURSE_LEVELS = [
+      { lvl: 1, title: 'SI Units & Dimensional Analysis', cat: 'Foundations', formula: '[M][L][T]⁻²' },
+      { lvl: 2, title: 'Linear Kinematics & Velocity', cat: 'Kinematics', formula: 'v = d / t' },
+      { lvl: 3, title: 'Uniform Acceleration Dynamics', cat: 'Kinematics', formula: 'v = u + at' },
+      { lvl: 4, title: "Newton's Laws & Net Force", cat: 'Mechanics', formula: 'F = ma' },
+      { lvl: 5, title: 'Mechanical Work & Power', cat: 'Energy', formula: 'W = Fd, P = W/t' },
+      { lvl: 6, title: 'Momentum & Kinetic Energy', cat: 'Energy', formula: 'p = mv, KE = ½mv²' },
+      { lvl: 7, title: 'Centripetal Acceleration', cat: 'Circular', formula: 'a_c = v²/r' },
+      { lvl: 8, title: 'Universal Gravitation', cat: 'Astrophysics', formula: 'F = G(m₁m₂)/r²' },
+      { lvl: 9, title: 'Fluid Statics & Buoyancy', cat: 'Fluids', formula: 'P = ρgh' },
+      { lvl: 10, title: 'Ideal Gas Thermodynamics', cat: 'Thermodynamics', formula: 'PV = nRT' },
+      { lvl: 11, title: 'Wave Mechanics & Doppler', cat: 'Waves', formula: 'v = fλ' },
+      { lvl: 12, title: "Optics & Snell's Law", cat: 'Optics', formula: 'n₁sinθ₁ = n₂sinθ₂' },
+      { lvl: 13, title: "Electrostatics & Coulomb's Law", cat: 'Electromagnetism', formula: 'F = kq₁q₂/r²' },
+      { lvl: 14, title: "DC Circuits & Ohm's Law", cat: 'Circuits', formula: 'V = IR, P = VI' },
+      { lvl: 15, title: 'Faraday-Lenz Induction', cat: 'Electromagnetism', formula: 'ε = -dΦ/dt' },
+      { lvl: 16, title: 'Photoelectric Quantum Effect', cat: 'Quantum', formula: 'E = hf, KE_max' },
+      { lvl: 17, title: 'Atomic Orbitals & Decay', cat: 'Nuclear', formula: 'N(t) = N₀e⁻λᵗ' },
+      { lvl: 18, title: 'Special & General Relativity', cat: 'Relativity', formula: 'E = mc², G_μν' },
+      { lvl: 19, title: 'Quantum Field Theory (MAX LEVEL)', cat: 'Cosmology', formula: 'G_μν + Λg_μν = κT_μν' }
+    ];
+
+    function renderCoursesGrid() {
+      const grid = document.getElementById('courses-levels-grid');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      COURSE_LEVELS.forEach(c => {
+        const card = document.createElement('div');
+        card.className = 'p-4 rounded-xl glass-panel border border-slate-700/60 hover:border-amber-400/50 transition space-y-2';
+        card.innerHTML = `
+          <div class="flex items-center justify-between text-xs font-mono">
+            <span class="px-2 py-0.5 rounded ${c.lvl === 19 ? 'bg-amber-500 text-slate-950 font-black' : 'bg-amber-500/20 text-amber-300'}">LEVEL ${c.lvl} ${c.lvl === 19 ? '★ MAX' : ''}</span>
+            <span class="text-slate-400">${c.cat}</span>
+          </div>
+          <h3 class="text-sm font-bold text-white">${c.title}</h3>
+          <div class="text-xs font-mono text-sky-400 bg-sci-card/80 px-2 py-1 rounded border border-sci-border">${c.formula}</div>
+          <button onclick="switchNavTab('equation-playground')" class="w-full mt-2 py-1 rounded-lg bg-sci-card hover:bg-amber-500/20 text-[11px] text-amber-300 font-semibold border border-sci-border transition">
+            Launch Station Practice →
+          </button>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    /* =========================================================================
+       9. 17 VIRTUAL LABS INITIALIZATION & LIVE SIMULATION ENGINES
+       ========================================================================= */
+    const VIRTUAL_LABS_CONFIG = [
+      {
+        id: 0,
+        name: "1. Snell's Law & Refraction Index",
+        category: "Optics",
+        desc: "Adjust the incident laser angle (θ₁) and refractive indices (n₁, n₂) to observe optical refraction and Total Internal Reflection (TIR) according to Snell's Law: n₁·sin(θ₁) = n₂·sin(θ₂).",
+        params: [
+          { key: 'theta', label: 'Incident Angle (θ₁)', min: 0, max: 85, step: 1, val: 45, unit: '°' },
+          { key: 'n1', label: 'Medium 1 Index (n₁)', min: 1.0, max: 2.5, step: 0.05, val: 1.0, unit: '' },
+          { key: 'n2', label: 'Medium 2 Index (n₂)', min: 1.0, max: 2.5, step: 0.05, val: 1.5, unit: '' }
+        ],
+        render: (ctx, w, h, p, t) => {
+          const midY = h / 2;
+          // Medium 1 and 2 backgrounds
+          ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+          ctx.fillRect(0, 0, w, midY);
+          ctx.fillStyle = 'rgba(30, 58, 138, 0.25)';
+          ctx.fillRect(0, midY, w, midY);
+
+          // Boundary line
+          ctx.strokeStyle = '#38bdf8';
+          ctx.lineWidth = 2;
+          ctx.beginPath(); ctx.moveTo(0, midY); ctx.lineTo(w, midY); ctx.stroke();
+
+          // Normal dashed line
+          ctx.strokeStyle = '#64748b';
+          ctx.lineWidth = 1.5;
+          ctx.setLineDash([4, 4]);
+          ctx.beginPath(); ctx.moveTo(w / 2, 20); ctx.lineTo(w / 2, h - 20); ctx.stroke();
+          ctx.setLineDash([]);
+
+          ctx.fillStyle = '#94a3b8';
+          ctx.font = '11px monospace';
+          ctx.fillText(`Medium 1 (n₁ = ${p.n1.toFixed(2)})`, 15, 30);
+          ctx.fillText(`Medium 2 (n₂ = ${p.n2.toFixed(2)})`, 15, midY + 30);
+
+          const cx = w / 2;
+          const cy = midY;
+          const rTheta = (p.theta * Math.PI) / 180;
+          const beamLen = 140;
+
+          // Incident Ray
+          const inX = cx - Math.sin(rTheta) * beamLen;
+          const inY = cy - Math.cos(rTheta) * beamLen;
+          ctx.strokeStyle = '#f43f5e';
+          ctx.lineWidth = 3;
+          ctx.beginPath(); ctx.moveTo(inX, inY); ctx.lineTo(cx, cy); ctx.stroke();
+
+          // Snell calculation: n1*sin(t1) = n2*sin(t2)
+          const sinT2 = (p.n1 / p.n2) * Math.sin(rTheta);
+          if (sinT2 <= 1.0) {
+            const rTheta2 = Math.asin(sinT2);
+            const refX = cx + Math.sin(rTheta2) * beamLen;
+            const refY = cy + Math.cos(rTheta2) * beamLen;
+            ctx.strokeStyle = '#00f2fe';
+            ctx.lineWidth = 3;
+            ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(refX, refY); ctx.stroke();
+
+            const deg2 = ((rTheta2 * 180) / Math.PI).toFixed(1);
+            ctx.fillStyle = '#00f2fe';
+            ctx.fillText(`Refracted θ₂ = ${deg2}°`, cx + 20, cy + 50);
+          } else {
+            // Total Internal Reflection
+            const tirX = cx + Math.sin(rTheta) * beamLen;
+            const tirY = cy - Math.cos(rTheta) * beamLen;
+            ctx.strokeStyle = '#f59e0b';
+            ctx.lineWidth = 3;
+            ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(tirX, tirY); ctx.stroke();
+            ctx.fillStyle = '#f59e0b';
+            ctx.fillText(`TOTAL INTERNAL REFLECTION!`, cx + 20, cy - 30);
+          }
+        }
+      },
+      {
+        id: 1,
+        name: "2. Ideal Gas Thermal Chamber",
+        category: "Thermodynamics",
+        desc: "Molecules collide elastically with the chamber walls. Modulating temperature accelerates molecular velocity while altering volume changes collision frequency.",
+        params: [
+          { key: 'temp', label: 'Temperature (T)', min: 100, max: 600, step: 10, val: 300, unit: 'K' },
+          { key: 'vol', label: 'Chamber Width (V)', min: 120, max: 320, step: 5, val: 220, unit: 'px' }
+        ],
+        render: (ctx, w, h, p, t) => {
+          const chX = (w - p.vol) / 2;
+          const chY = h * 0.2;
+          const chH = h * 0.6;
+
+          // Chamber box & movable piston
+          ctx.strokeStyle = '#38bdf8';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(chX, chY, p.vol, chH);
+
+          // Piston head
+          ctx.fillStyle = '#475569';
+          ctx.fillRect(chX + p.vol - 10, chY, 10, chH);
+
+          const speed = (p.temp / 300) * 2.2;
+          const count = 28;
+          ctx.fillStyle = '#f43f5e';
+
+          for (let i = 0; i < count; i++) {
+            const px = chX + 12 + ((i * 31 + t * speed * 45) % (p.vol - 26));
+            const py = chY + 12 + ((i * 47 + Math.sin(t * speed + i) * 40 + 50) % (chH - 24));
+            ctx.beginPath(); ctx.arc(px, py, 3.5, 0, Math.PI * 2); ctx.fill();
+          }
+
+          // Real-time Pressure calculation
+          const pressure = ((count * p.temp) / p.vol).toFixed(1);
+          ctx.fillStyle = '#38bdf8';
+          ctx.font = 'bold 12px monospace';
+          ctx.fillText(`Pressure Gauge: ${pressure} kPa`, chX, chY - 12);
+        }
+      },
+      {
+        id: 2,
+        name: "3. Double-Slit Quantum Interference",
+        category: "Wave Mechanics",
+        desc: "Monochromatic coherent light passes through two pinhole slits, generating semicircular wavelets that interfere constructively and destructively onto a detector screen.",
+        params: [
+          { key: 'slitDist', label: 'Slit Separation (d)', min: 20, max: 80, step: 2, val: 40, unit: 'px' },
+          { key: 'lambda', label: 'Wavelength (λ)', min: 10, max: 40, step: 2, val: 20, unit: 'nm' }
+        ],
+        render: (ctx, w, h, p, t) => {
+          const cy = h / 2;
+          const barrierX = w * 0.35;
+          const screenX = w * 0.88;
+
+          // Barrier with two slits
+          ctx.strokeStyle = '#475569';
+          ctx.lineWidth = 4;
+          ctx.beginPath();
+          ctx.moveTo(barrierX, 0); ctx.lineTo(barrierX, cy - p.slitDist / 2);
+          ctx.moveTo(barrierX, cy - p.slitDist / 2 + 10); ctx.lineTo(barrierX, cy + p.slitDist / 2 - 10);
+          ctx.moveTo(barrierX, cy + p.slitDist / 2); ctx.lineTo(barrierX, h);
+          ctx.stroke();
+
+          // Semicircular interfering wave fronts
+          ctx.lineWidth = 1.2;
+          for (let r = 10; r < 200; r += p.lambda) {
+            const rad = (r + (t * 25) % p.lambda);
+            ctx.strokeStyle = 'rgba(56, 189, 248, 0.4)';
+            ctx.beginPath(); ctx.arc(barrierX, cy - p.slitDist / 2 + 5, rad, -Math.PI / 2, Math.PI / 2); ctx.stroke();
+            ctx.strokeStyle = 'rgba(245, 158, 11, 0.4)';
+            ctx.beginPath(); ctx.arc(barrierX, cy + p.slitDist / 2 - 5, rad, -Math.PI / 2, Math.PI / 2); ctx.stroke();
+          }
+
+          // Interference pattern on screen
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 2;
+          ctx.beginPath(); ctx.moveTo(screenX, 20); ctx.lineTo(screenX, h - 20); ctx.stroke();
+
+          for (let y = 20; y < h - 20; y += 4) {
+            const yOffset = y - cy;
+            const phase = (Math.PI * p.slitDist * yOffset) / (p.lambda * 40);
+            const intensity = Math.pow(Math.cos(phase), 2);
+            ctx.fillStyle = `rgba(0, 242, 254, ${intensity.toFixed(2)})`;
+            ctx.fillRect(screenX + 4, y, 16, 4);
+          }
+          ctx.fillStyle = '#38bdf8';
+          ctx.font = '10px monospace';
+          ctx.fillText('Detector Screen', screenX - 45, 18);
+        }
+      },
+      {
+        id: 3,
+        name: "4. Photoelectric Frequency Threshold",
+        category: "Quantum Mechanics",
+        desc: "Incident photons strike a metallic emitter plate. Only photons with energy greater than the work function (hf > Φ) liberate photoelectrons.",
+        params: [
+          { key: 'freq', label: 'Photon Frequency (f)', min: 1.0, max: 5.0, step: 0.1, val: 2.8, unit: '×10¹⁴ Hz' },
+          { key: 'intensity', label: 'Light Intensity', min: 2, max: 10, step: 1, val: 5, unit: 'kW/m²' }
+        ],
+        render: (ctx, w, h, p, t) => {
+          const cy = h / 2;
+          const plateX1 = w * 0.25;
+          const plateX2 = w * 0.75;
+          const workFunction = 2.2; // threshold
+
+          // Capacitor Plates
+          ctx.fillStyle = '#64748b';
+          ctx.fillRect(plateX1, cy - 70, 12, 140);
+          ctx.fillStyle = '#334155';
+          ctx.fillRect(plateX2, cy - 70, 12, 140);
+
+          ctx.fillStyle = '#94a3b8';
+          ctx.font = '10px monospace';
+          ctx.fillText('Cathode (Φ = 2.2 eV)', plateX1 - 20, cy - 80);
+          ctx.fillText('Anode (+)', plateX2 - 10, cy - 80);
+
+          // Photon beam (incoming wavy rays)
+          ctx.strokeStyle = p.freq >= workFunction ? '#00f2fe' : '#f59e0b';
+          ctx.lineWidth = 2;
+          for (let i = 0; i < p.intensity; i++) {
+            const rayY = cy - 50 + i * (100 / p.intensity);
+            ctx.beginPath();
+            for (let x = 30; x < plateX1; x += 5) {
+              const yWave = rayY + Math.sin(x * 0.2 + t * p.freq * 8) * 4;
+              if (x === 30) ctx.moveTo(x, yWave); else ctx.lineTo(x, yWave);
+            }
+            ctx.stroke();
+          }
+
+          // Photoelectrons ejection if above threshold
+          if (p.freq >= workFunction) {
+            const ke = (p.freq - workFunction).toFixed(2);
+            ctx.fillStyle = '#10b981';
+            ctx.font = 'bold 11px monospace';
+            ctx.fillText(`Electrons Ejected! KE_max = ${ke} eV`, plateX1 + 25, cy - 50);
+
+            ctx.fillStyle = '#fbbf24';
+            for (let j = 0; j < p.intensity * 2; j++) {
+              const eX = plateX1 + 14 + ((j * 23 + t * (p.freq * 30)) % (plateX2 - plateX1 - 18));
+              const eY = cy - 40 + (j * 17) % 80;
+              ctx.beginPath(); ctx.arc(eX, eY, 3, 0, Math.PI * 2); ctx.fill();
+            }
+          } else {
+            ctx.fillStyle = '#f43f5e';
+            ctx.font = 'bold 11px monospace';
+            ctx.fillText('hf < Φ: No Electrons Emitted (Below Threshold)', plateX1 + 20, cy);
+          }
+        }
+      },
+      {
+        id: 4,
+        name: "5. Archimedes Fluid Buoyancy",
+        category: "Fluids",
+        desc: "A solid block is immersed in a liquid column. The upward buoyant force equals the weight of displaced liquid (F_b = ρ_f · V_disp · g).",
+        params: [
+          { key: 'blockDensity', label: 'Object Density (ρ_obj)', min: 400, max: 1800, step: 50, val: 800, unit: 'kg/m³' },
+          { key: 'fluidDensity', label: 'Fluid Density (ρ_fluid)', min: 800, max: 1400, step: 50, val: 1000, unit: 'kg/m³' }
+        ],
+        render: (ctx, w, h, p, t) => {
+          const tankW = 180, tankH = 160;
+          const tx = (w - tankW) / 2;
+          const ty = (h - tankH) / 2 + 10;
+          const waterLevel = ty + 40;
+
+          // Glass Tank
+          ctx.strokeStyle = '#38bdf8';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(tx, ty, tankW, tankH);
+
+          // Liquid
+          ctx.fillStyle = 'rgba(14, 165, 233, 0.35)';
+          ctx.fillRect(tx + 2, waterLevel, tankW - 4, tankH - (waterLevel - ty) - 2);
+
+          // Equilibrium submerged fraction
+          const ratio = p.blockDensity / p.fluidDensity;
+          const bW = 50, bH = 50;
+          const bx = tx + (tankW - bW) / 2;
+          let by;
+          if (ratio < 1.0) {
+            by = waterLevel - bH * (1 - ratio);
+          } else {
+            by = Math.min(ty + tankH - bH - 4, waterLevel + (ratio - 1) * 30);
+          }
+
+          // Block
+          ctx.fillStyle = ratio > 1.0 ? '#b45309' : '#0284c7';
+          ctx.fillRect(bx, by, bW, bH);
+          ctx.strokeStyle = '#ffffff';
+          ctx.strokeRect(bx, by, bW, bH);
+
+          // Buoyant & Gravity force vectors
+          ctx.strokeStyle = '#10b981';
+          ctx.lineWidth = 2.5;
+          ctx.beginPath(); ctx.moveTo(bx + bW / 2, by); ctx.lineTo(bx + bW / 2, by - 28); ctx.stroke();
+          ctx.fillStyle = '#10b981';
+          ctx.fillText('F_buoyant', bx + bW / 2 + 6, by - 16);
+
+          ctx.strokeStyle = '#f43f5e';
+          ctx.beginPath(); ctx.moveTo(bx + bW / 2, by + bH); ctx.lineTo(bx + bW / 2, by + bH + 28); ctx.stroke();
+          ctx.fillStyle = '#f43f5e';
+          ctx.fillText('F_gravity', bx + bW / 2 + 6, by + bH + 20);
+        }
+      },
+      {
+        id: 5,
+        name: "6. Doppler Acoustic Frequency",
+        category: "Acoustics",
+        desc: "A moving acoustic emitter produces wavefronts compressed in front of its path (higher perceived pitch) and stretched behind it.",
+        params: [
+          { key: 'sourceSpeed', label: 'Source Speed (v_s)', min: 0.1, max: 1.2, step: 0.1, val: 0.6, unit: 'Mach' }
+        ],
+        render: (ctx, w, h, p, t) => {
+          const cy = h / 2;
+          const pathW = w - 100;
+          const xPos = 50 + (t * p.sourceSpeed * 100) % pathW;
+
+          // Sound wave circles
+          ctx.lineWidth = 1.5;
+          for (let i = 0; i < 7; i++) {
+            const age = (t * 40 + i * 25) % 180;
+            const pastX = xPos - (age * p.sourceSpeed * 1.2);
+            ctx.strokeStyle = `rgba(56, 189, 248, ${Math.max(0, 1 - age / 180)})`;
+            ctx.beginPath(); ctx.arc(pastX, cy, age, 0, Math.PI * 2); ctx.stroke();
+          }
+
+          // Moving sound source
+          ctx.fillStyle = '#f59e0b';
+          ctx.beginPath(); ctx.arc(xPos, cy, 8, 0, Math.PI * 2); ctx.fill();
+          ctx.strokeStyle = '#ffffff'; ctx.stroke();
+
+          ctx.fillStyle = '#38bdf8';
+          ctx.font = '11px monospace';
+          ctx.fillText(`Observer Front: f' = ${((1 / (1 - Math.min(0.95, p.sourceSpeed))) * 440).toFixed(0)} Hz`, w - 210, 30);
+          ctx.fillText(`Observer Rear: f' = ${((1 / (1 + p.sourceSpeed)) * 440).toFixed(0)} Hz`, 20, 30);
+        }
+      },
+      {
+        id: 6,
+        name: "7. Radioactive Half-Life Decay",
+        category: "Nuclear Physics",
+        desc: "Parent radioisotopes decay exponentially into stable daughter nuclei: N(t) = N₀ · e^(-λt). Observe probability of decay over time.",
+        params: [
+          { key: 'halfLife', label: 'Half-Life (t₁/₂)', min: 2, max: 15, step: 1, val: 6, unit: 's' }
+        ],
+        render: (ctx, w, h, p, t) => {
+          const lambda = Math.LN2 / p.halfLife;
+          const elapsed = t % (p.halfLife * 4);
+          const fraction = Math.exp(-lambda * elapsed);
+
+          // Grid of 64 atoms
+          const startX = 40, startY = 40;
+          const rows = 8, cols = 8, spacing = 20;
+
+          for (let r = 0; r < rows; r++) {
+            for (let c = 0; c < cols; c++) {
+              const atomIndex = r * cols + c;
+              const decayProb = (atomIndex * 137.5) % 100 / 100;
+              const isDecayed = decayProb > fraction;
+
+              ctx.fillStyle = isDecayed ? '#334155' : '#10b981';
+              ctx.beginPath();
+              ctx.arc(startX + c * spacing, startY + r * spacing, 6, 0, Math.PI * 2);
+              ctx.fill();
+            }
+          }
+
+          // Real-time Decay Curve
+          const graphX = w - 180, graphY = h - 40;
+          ctx.strokeStyle = '#64748b';
+          ctx.beginPath(); ctx.moveTo(graphX, graphY); ctx.lineTo(graphX + 140, graphY);
+          ctx.moveTo(graphX, graphY); ctx.lineTo(graphX, graphY - 100); ctx.stroke();
+
+          ctx.strokeStyle = '#00f2fe';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          for (let x = 0; x <= 130; x += 5) {
+            const simT = (x / 130) * (p.halfLife * 4);
+            const yVal = Math.exp(-lambda * simT);
+            const py = graphY - yVal * 95;
+            if (x === 0) ctx.moveTo(graphX + x, py); else ctx.lineTo(graphX + x, py);
+          }
+          ctx.stroke();
+
+          ctx.fillStyle = '#00f2fe';
+          ctx.font = '11px monospace';
+          ctx.fillText(`Parent Remaining: ${(fraction * 100).toFixed(1)}%`, w - 180, 40);
+          ctx.fillText(`Elapsed: ${elapsed.toFixed(1)} s`, w - 180, 60);
+        }
+      },
+      {
+        id: 7,
+        name: "8. Coulomb Electrostatic Field",
+        category: "Electromagnetism",
+        desc: "Visualizes the electrostatic force between two point charges. Identical charges repel; opposite charges attract inversely with distance squared.",
+        params: [
+          { key: 'q1', label: 'Charge 1 (q₁)', min: -5, max: 5, step: 1, val: 3, unit: 'μC' },
+          { key: 'q2', label: 'Charge 2 (q₂)', min: -5, max: 5, step: 1, val: -3, unit: 'μC' },
+          { key: 'dist', label: 'Separation (r)', min: 80, max: 240, step: 10, val: 150, unit: 'px' }
+        ],
+        render: (ctx, w, h, p, t) => {
+          const cy = h / 2;
+          const cx1 = (w - p.dist) / 2;
+          const cx2 = cx1 + p.dist;
+
+          // Electric field connecting arcs
+          const isOpposite = (p.q1 * p.q2) < 0;
+          ctx.strokeStyle = isOpposite ? 'rgba(56, 189, 248, 0.4)' : 'rgba(244, 63, 94, 0.3)';
+          ctx.lineWidth = 1.5;
+
+          for (let a = -4; a <= 4; a++) {
+            if (a === 0) continue;
+            ctx.beginPath();
+            ctx.moveTo(cx1, cy);
+            ctx.bezierCurveTo(cx1 + p.dist * 0.3, cy + a * 25, cx2 - p.dist * 0.3, cy + a * 25, cx2, cy);
+            ctx.stroke();
+          }
+
+          // Charge 1
+          ctx.fillStyle = p.q1 >= 0 ? '#ef4444' : '#3b82f6';
+          ctx.beginPath(); ctx.arc(cx1, cy, 14, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = '#ffffff'; ctx.font = 'bold 12px monospace';
+          ctx.fillText(`${p.q1 > 0 ? '+' : ''}${p.q1}`, cx1 - 6, cy + 4);
+
+          // Charge 2
+          ctx.fillStyle = p.q2 >= 0 ? '#ef4444' : '#3b82f6';
+          ctx.beginPath(); ctx.arc(cx2, cy, 14, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = '#ffffff';
+          ctx.fillText(`${p.q2 > 0 ? '+' : ''}${p.q2}`, cx2 - 6, cy + 4);
+
+          // Force Readout
+          const force = (Math.abs(p.q1 * p.q2) * 89.9 / ((p.dist / 100) * (p.dist / 100))).toFixed(1);
+          ctx.fillStyle = '#f59e0b';
+          ctx.fillText(`Electrostatic Force: ${force} N (${isOpposite ? 'Attraction' : 'Repulsion'})`, w / 2 - 110, 30);
+        }
+      },
+      {
+        id: 8,
+        name: "9. Simple Harmonic Pendulum",
+        category: "Mechanics",
+        desc: "An ideal gravity pendulum swings with period T = 2π·√(L/g). Observe phase interchange between kinetic and gravitational potential energy.",
+        params: [
+          { key: 'len', label: 'Pendulum Length (L)', min: 80, max: 180, step: 5, val: 130, unit: 'px' },
+          { key: 'gravity', label: 'Gravity (g)', min: 1.6, max: 20, step: 0.5, val: 9.8, unit: 'm/s²' }
+        ],
+        render: (ctx, w, h, p, t) => {
+          const pivotX = w / 2;
+          const pivotY = 30;
+          const omega = Math.sqrt(p.gravity / (p.len * 0.05));
+          const thetaMax = 0.55; // 30 degrees
+          const theta = thetaMax * Math.cos(omega * t);
+
+          const bobX = pivotX + Math.sin(theta) * p.len;
+          const bobY = pivotY + Math.cos(theta) * p.len;
+
+          // Rod
+          ctx.strokeStyle = '#94a3b8';
+          ctx.lineWidth = 2;
+          ctx.beginPath(); ctx.moveTo(pivotX, pivotY); ctx.lineTo(bobX, bobY); ctx.stroke();
+
+          // Pivot
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath(); ctx.arc(pivotX, pivotY, 4, 0, Math.PI * 2); ctx.fill();
+
+          // Bob
+          ctx.fillStyle = '#00f2fe';
+          ctx.beginPath(); ctx.arc(bobX, bobY, 14, 0, Math.PI * 2); ctx.fill();
+          ctx.strokeStyle = '#38bdf8'; ctx.stroke();
+
+          // Period readout
+          const period = (2 * Math.PI / omega).toFixed(2);
+          ctx.fillStyle = '#38bdf8';
+          ctx.font = '11px monospace';
+          ctx.fillText(`Period T = ${period} s`, pivotX + 25, 45);
+        }
+      },
+      {
+        id: 9,
+        name: "10. RLC Circuit AC Resonance",
+        category: "Circuits",
+        desc: "Examines AC current and voltage waveforms in an RLC tank circuit. Resonance occurs when inductive reactance equals capacitive reactance (X_L = X_C).",
+        params: [
+          { key: 'freq', label: 'AC Frequency (f)', min: 0.5, max: 4.0, step: 0.1, val: 1.5, unit: 'Hz' }
+        ],
+        render: (ctx, w, h, p, t) => {
+          const cy = h / 2;
+          ctx.strokeStyle = '#334155';
+          ctx.lineWidth = 1;
+          ctx.beginPath(); ctx.moveTo(30, cy); ctx.lineTo(w - 30, cy); ctx.stroke();
+
+          // Waveform 1: Voltage (Yellow)
+          ctx.strokeStyle = '#f59e0b';
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          for (let x = 30; x < w - 30; x += 4) {
+            const vy = cy + Math.sin((x * 0.03 * p.freq) - t * 4) * 50;
+            if (x === 30) ctx.moveTo(x, vy); else ctx.lineTo(x, vy);
+          }
+          ctx.stroke();
+
+          // Waveform 2: Current with phase shift (Cyan)
+          ctx.strokeStyle = '#00f2fe';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          for (let x = 30; x < w - 30; x += 4) {
+            const iy = cy + Math.sin((x * 0.03 * p.freq) - t * 4 + 0.8) * 35;
+            if (x === 30) ctx.moveTo(x, iy); else ctx.lineTo(x, iy);
+          }
+          ctx.stroke();
+
+          ctx.fillStyle = '#f59e0b'; ctx.font = '11px monospace';
+          ctx.fillText('● Voltage V(t)', 40, 30);
+          ctx.fillStyle = '#00f2fe';
+          ctx.fillText('● Current I(t)', 160, 30);
+        }
+      },
+      {
+        id: 10,
+        name: "11. Blackbody Radiation Curves",
+        category: "Thermodynamics",
+        desc: "Spectral radiance curves obeying Planck's law and Wien's displacement law. Hotter stars peak at shorter wavelengths into the blue/UV regime.",
+        params: [
+          { key: 'temp', label: 'Surface Temp (T)', min: 2500, max: 8000, step: 250, val: 5500, unit: 'K' }
+        ],
+        render: (ctx, w, h, p, t) => {
+          const ox = 50, oy = h - 35;
+          ctx.strokeStyle = '#475569';
+          ctx.beginPath(); ctx.moveTo(ox, 20); ctx.lineTo(ox, oy); ctx.lineTo(w - 30, oy); ctx.stroke();
+
+          const lambdaPeak = (2.898e6 / p.temp); // nm
+          ctx.strokeStyle = '#f43f5e';
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+
+          for (let x = 0; x < (w - ox - 40); x += 4) {
+            const lambda = 200 + x * 4;
+            const curve = Math.pow(lambdaPeak / lambda, 5) * Math.exp(5 * (1 - lambdaPeak / lambda));
+            const y = oy - Math.min(oy - 30, curve * (p.temp / 80));
+            if (x === 0) ctx.moveTo(ox + x, y); else ctx.lineTo(ox + x, y);
+          }
+          ctx.stroke();
+
+          ctx.fillStyle = '#f59e0b';
+          ctx.font = '11px monospace';
+          ctx.fillText(`Peak Wavelength λ_max = ${lambdaPeak.toFixed(0)} nm`, ox + 20, 40);
+        }
+      },
+      {
+        id: 11,
+        name: "12. Rutherford Alpha Scattering",
+        category: "Nuclear Physics",
+        desc: "Alpha particles (He²⁺) are fired at a dense gold nucleus. Most pass through empty space, but direct impacts undergo Coulomb backscattering.",
+        params: [
+          { key: 'energy', label: 'Alpha Kinetic Energy', min: 2, max: 10, step: 0.5, val: 5, unit: 'MeV' }
+        ],
+        render: (ctx, w, h, p, t) => {
+          const nucX = w * 0.65, nucY = h / 2;
+
+          // Heavy Gold Nucleus (Au, Z=79)
+          ctx.fillStyle = '#f59e0b';
+          ctx.beginPath(); ctx.arc(nucX, nucY, 12, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = '#ffffff'; ctx.font = 'bold 10px monospace';
+          ctx.fillText('+79e', nucX - 10, nucY + 3);
+
+          // Alpha particle beams
+          ctx.strokeStyle = '#38bdf8';
+          ctx.lineWidth = 1.5;
+
+          const numBeams = 7;
+          for (let i = 0; i < numBeams; i++) {
+            const beamY = nucY - 60 + i * 20;
+            const bDist = Math.abs(beamY - nucY);
+            ctx.beginPath();
+            ctx.moveTo(30, beamY);
+
+            if (bDist < 15) {
+              // Direct impact hyperbolic bounce
+              ctx.lineTo(nucX - 25, nucY - 8);
+              ctx.lineTo(30, nucY - 80);
+            } else if (bDist < 35) {
+              ctx.quadraticCurveTo(nucX, beamY, w - 30, beamY + (beamY > nucY ? 35 : -35));
+            } else {
+              ctx.lineTo(w - 30, beamY);
+            }
+            ctx.stroke();
+          }
+        }
+      },
+      {
+        id: 12,
+        name: "13. Millikan Oil Drop Charge",
+        category: "Atomic Physics",
+        desc: "Suspends negatively charged microscopic oil droplets by balancing downward gravity with an adjustable upward electrostatic field: q·E = m·g.",
+        params: [
+          { key: 'voltage', label: 'Plate Voltage (V)', min: 100, max: 500, step: 10, val: 320, unit: 'V' }
+        ],
+        render: (ctx, w, h, p, t) => {
+          const cx = w / 2;
+          // Capacitor plates
+          ctx.fillStyle = '#64748b';
+          ctx.fillRect(cx - 100, 40, 200, 10);
+          ctx.fillRect(cx - 100, h - 50, 200, 10);
+
+          ctx.fillStyle = '#f43f5e'; ctx.fillText('+ + + Positive Plate + + +', cx - 80, 32);
+          ctx.fillStyle = '#38bdf8'; ctx.fillText('- - - Negative Plate - - -', cx - 80, h - 25);
+
+          // Droplet equilibrium position
+          const balanceV = 300;
+          const deltaV = p.voltage - balanceV;
+          const dropY = (h / 2) - deltaV * 0.4 + Math.sin(t * 3) * 3;
+
+          // Oil Droplet
+          ctx.fillStyle = '#f59e0b';
+          ctx.beginPath(); ctx.arc(cx, dropY, 6, 0, Math.PI * 2); ctx.fill();
+          ctx.strokeStyle = '#ffffff'; ctx.stroke();
+
+          ctx.fillStyle = '#ffffff';
+          ctx.font = '11px monospace';
+          if (Math.abs(deltaV) < 15) {
+            ctx.fillText('★ PERFECT EQUILIBRIUM: qE = mg', cx - 90, h / 2 - 25);
+          } else if (deltaV > 0) {
+            ctx.fillText('▲ Rising: Electric Field Exceeds Gravity', cx - 95, h / 2 - 25);
+          } else {
+            ctx.fillText('▼ Falling: Gravity Exceeds Electric Field', cx - 95, h / 2 - 25);
+          }
+        }
+      },
+      {
+        id: 13,
+        name: "14. Torricelli Barometric Column",
+        category: "Fluids",
+        desc: "Demonstrates atmospheric pressure sustaining an inverted column of mercury: P_atm = ρ · g · h.",
+        params: [
+          { key: 'atm', label: 'Atmospheric Pressure', min: 80, max: 120, step: 2, val: 101, unit: 'kPa' }
+        ],
+        render: (ctx, w, h, p, t) => {
+          const cx = w / 2;
+          const mercuryHeight = (p.atm / 101.3) * 110;
+
+          // Mercury reservoir
+          ctx.fillStyle = '#94a3b8';
+          ctx.fillRect(cx - 70, h - 60, 140, 40);
+
+          // Glass tube
+          ctx.strokeStyle = '#38bdf8';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(cx - 15, h - 60 - mercuryHeight - 20, 30, mercuryHeight + 20);
+
+          // Mercury in tube
+          ctx.fillStyle = '#cbd5e1';
+          ctx.fillRect(cx - 13, h - 60 - mercuryHeight, 26, mercuryHeight);
+
+          ctx.fillStyle = '#38bdf8';
+          ctx.font = '11px monospace';
+          ctx.fillText(`Height: ${((p.atm / 101.3) * 760).toFixed(0)} mmHg`, cx + 30, h - 60 - mercuryHeight / 2);
+          ctx.fillText('Vacuum (Torricelli space)', cx - 80, h - 75 - mercuryHeight);
+        }
+      },
+      {
+        id: 14,
+        name: "15. Magnetic Induction Dynamo",
+        category: "Electromagnetism",
+        desc: "A conductive armature rotates in a uniform magnetic field, generating an induced alternating voltage proportional to angular velocity: ε = -dΦ/dt.",
+        params: [
+          { key: 'rpm', label: 'Rotation Speed (ω)', min: 1, max: 8, step: 1, val: 4, unit: 'rad/s' }
+        ],
+        render: (ctx, w, h, p, t) => {
+          const cx = w / 2, cy = h / 2;
+
+          // N and S Pole Magnets
+          ctx.fillStyle = '#ef4444'; ctx.fillRect(cx - 130, cy - 40, 40, 80);
+          ctx.fillStyle = '#3b82f6'; ctx.fillRect(cx + 90, cy - 40, 40, 80);
+          ctx.fillStyle = '#ffffff'; ctx.font = 'bold 16px monospace';
+          ctx.fillText('N', cx - 118, cy + 8); ctx.fillText('S', cx + 105, cy + 8);
+
+          // Rotating coil
+          const angle = t * p.rpm;
+          const coilW = Math.cos(angle) * 50;
+
+          ctx.strokeStyle = '#f59e0b';
+          ctx.lineWidth = 3;
+          ctx.strokeRect(cx - Math.abs(coilW) / 2, cy - 30, Math.abs(coilW), 60);
+
+          // Light bulb indicator
+          const voltage = Math.sin(angle);
+          const glow = Math.abs(voltage);
+          ctx.fillStyle = `rgba(253, 224, 71, ${glow.toFixed(2)})`;
+          ctx.beginPath(); ctx.arc(cx, cy + 70, 15, 0, Math.PI * 2); ctx.fill();
+          ctx.strokeStyle = '#ffffff'; ctx.stroke();
+          ctx.fillStyle = '#ffffff'; ctx.font = '10px monospace';
+          ctx.fillText('LOAD BULB', cx - 28, cy + 98);
+        }
+      },
+      {
+        id: 15,
+        name: "16. Michelson Laser Interferometer",
+        category: "Optics",
+        desc: "Splits a coherent laser into two perpendicular paths. Recombining the beams yields interference fringes sensitive to nanometer displacements.",
+        params: [
+          { key: 'mirrorShift', label: 'Mirror Shift (Δd)', min: 0, max: 10, step: 0.5, val: 3.5, unit: 'μm' }
+        ],
+        render: (ctx, w, h, p, t) => {
+          const cx = w * 0.4, cy = h * 0.55;
+
+          // Laser emitter
+          ctx.fillStyle = '#475569'; ctx.fillRect(40, cy - 10, 40, 20);
+          ctx.fillStyle = '#f43f5e'; ctx.font = '10px monospace'; ctx.fillText('LASER', 42, cy + 4);
+
+          // Beamsplitter (45 deg)
+          ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 3;
+          ctx.beginPath(); ctx.moveTo(cx - 15, cy - 15); ctx.lineTo(cx + 15, cy + 15); ctx.stroke();
+
+          // Laser paths
+          ctx.strokeStyle = '#f43f5e'; ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(80, cy); ctx.lineTo(cx, cy);
+          ctx.lineTo(cx, cy - 80); // Arm 1
+          ctx.moveTo(cx, cy); ctx.lineTo(cx + 80, cy); // Arm 2
+          ctx.stroke();
+
+          // Interference concentric rings on detector
+          const detX = w - 100, detY = cy;
+          ctx.fillStyle = '#0f172a';
+          ctx.beginPath(); ctx.arc(detX, detY, 45, 0, Math.PI * 2); ctx.fill();
+          ctx.strokeStyle = '#38bdf8'; ctx.stroke();
+
+          for (let r = 5; r <= 40; r += 7) {
+            const phase = (r + p.mirrorShift * 5 + t * 10) % 35;
+            ctx.strokeStyle = `rgba(244, 63, 94, ${Math.sin(phase * 0.4) > 0 ? 0.9 : 0.1})`;
+            ctx.lineWidth = 3;
+            ctx.beginPath(); ctx.arc(detX, detY, r, 0, Math.PI * 2); ctx.stroke();
+          }
+          ctx.fillStyle = '#ffffff'; ctx.fillText('Detector Fringes', detX - 45, detY + 58);
+        }
+      },
+      {
+        id: 16,
+        name: "17. Superconductivity Meissner Effect",
+        category: "Condensed Matter",
+        desc: "Cooling a superconductor below its critical temperature (T_c) expels internal magnetic flux, enabling frictionless magnetic levitation.",
+        params: [
+          { key: 'temp', label: 'Temperature (T)', min: 10, max: 140, step: 2, val: 50, unit: 'K' }
+        ],
+        render: (ctx, w, h, p, t) => {
+          const cx = w / 2, cy = h / 2 + 30;
+          const isSuperconducting = p.temp < 93; // YBCO transition at 93K
+
+          // Superconducting Pellet
+          ctx.fillStyle = isSuperconducting ? '#0284c7' : '#475569';
+          ctx.fillRect(cx - 60, cy, 120, 24);
+          ctx.strokeStyle = '#38bdf8'; ctx.strokeRect(cx - 60, cy, 120, 24);
+
+          // Permanent Magnet
+          const levY = isSuperconducting ? cy - 45 + Math.sin(t * 3) * 2 : cy - 8;
+          ctx.fillStyle = '#ef4444'; ctx.fillRect(cx - 20, levY, 20, 10);
+          ctx.fillStyle = '#3b82f6'; ctx.fillRect(cx, levY, 20, 10);
+
+          if (isSuperconducting) {
+            // Expelled magnetic field lines curving around pellet
+            ctx.strokeStyle = 'rgba(56, 189, 248, 0.4)';
+            ctx.lineWidth = 1.5;
+            for (let i = -3; i <= 3; i++) {
+              ctx.beginPath();
+              ctx.moveTo(cx + i * 25, cy + 30);
+              ctx.quadraticCurveTo(cx + i * 40, cy - 25, cx + i * 25, cy - 65);
+              ctx.stroke();
+            }
+            ctx.fillStyle = '#10b981';
+            ctx.font = 'bold 11px monospace';
+            ctx.fillText('★ MEISSNER EFFECT: MAGNETIC LEVITATION', cx - 115, 35);
+          } else {
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = '11px monospace';
+            ctx.fillText('T > T_c (Normal State): No Levitation', cx - 100, 35);
+          }
+        }
+      }
+    ];
+
+    let activeVLabIndex = 0;
+    let vlabParamValues = {};
+    let vlabAnimTime = 0;
+
+    function selectVirtualLab(index) {
+      activeVLabIndex = index;
+      const lab = VIRTUAL_LABS_CONFIG[index];
+      if (!lab) return;
+
+      // Update Titles
+      document.getElementById('vlab-title').innerText = lab.name;
+      document.getElementById('vlab-desc').innerText = lab.desc;
+
+      // Initialize parameter values
+      vlabParamValues = {};
+      lab.params.forEach(p => {
+        vlabParamValues[p.key] = p.val;
+      });
+
+      renderVLabControls();
+      renderVirtualLabsList();
+    }
+
+    function renderVLabControls() {
+      const container = document.getElementById('vlab-controls-container');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const lab = VIRTUAL_LABS_CONFIG[activeVLabIndex];
+      if (!lab) return;
+
+      lab.params.forEach(p => {
+        const row = document.createElement('div');
+        row.className = 'space-y-1.5';
+        row.innerHTML = `
+          <div class="flex items-center justify-between text-xs">
+            <span class="text-slate-300 font-semibold">${p.label}</span>
+            <span id="vlab-readout-${p.key}" class="font-mono text-emerald-400 font-bold">${vlabParamValues[p.key]} ${p.unit}</span>
+          </div>
+          <input type="range" 
+            min="${p.min}" 
+            max="${p.max}" 
+            step="${p.step}" 
+            value="${vlabParamValues[p.key]}" 
+            oninput="handleVLabSlider('${p.key}', this.value, '${p.unit}')"
+            class="w-full accent-emerald-500">
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    window.handleVLabSlider = function(key, val, unit) {
+      vlabParamValues[key] = parseFloat(val);
+      const readout = document.getElementById('vlab-readout-' + key);
+      if (readout) readout.innerText = `${val} ${unit}`;
+    };
+
+    function renderVirtualLabsList() {
+      const grid = document.getElementById('vlabs-list-grid');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      VIRTUAL_LABS_CONFIG.forEach((lab, idx) => {
+        const item = document.createElement('div');
+        const isActive = idx === activeVLabIndex;
+        item.className = `p-2.5 rounded-lg border cursor-pointer transition text-xs flex items-center justify-between ${
+          isActive 
+            ? 'bg-emerald-500/20 border-emerald-400 text-white font-bold shadow-lg shadow-emerald-500/10' 
+            : 'glass-panel border-slate-700/60 hover:border-emerald-400/50 text-slate-300'
+        }`;
+        item.onclick = () => selectVirtualLab(idx);
+        item.innerHTML = `
+          <span class="truncate pr-2">${lab.name}</span>
+          <span class="text-[9px] font-mono px-1.5 py-0.5 rounded ${isActive ? 'bg-emerald-400 text-slate-950' : 'bg-sci-card text-emerald-300'}">LAB ${idx+1}</span>
+        `;
+        grid.appendChild(item);
+      });
+    }
+
+    function initVirtualLabCanvas() {
+      const canvas = document.getElementById('canvas-vlab-sim');
+      if (!canvas) return;
+
+      function resizeVLab() {
+        const parent = canvas.parentElement;
+        if (parent && parent.clientWidth > 40) {
+          canvas.width = parent.clientWidth;
+          canvas.height = parent.clientHeight || 288;
+        }
+      }
+      resizeVLab();
+      window.addEventListener('resize', resizeVLab);
+
+      function vlabAnimationLoop() {
+        resizeVLab();
+        const ctx = canvas.getContext('2d');
+        const w = canvas.width;
+        const h = canvas.height;
+
+        ctx.fillStyle = '#070b14';
+        ctx.fillRect(0, 0, w, h);
+
+        vlabAnimTime += 0.03;
+        const lab = VIRTUAL_LABS_CONFIG[activeVLabIndex];
+        if (lab && lab.render) {
+          lab.render(ctx, w, h, vlabParamValues, vlabAnimTime);
+        }
+
+        requestAnimationFrame(vlabAnimationLoop);
+      }
+      vlabAnimationLoop();
+    }
+
+    /* =========================================================================
+       10. 3D WEBGL SCIENTIFIC EXPLORER (Three.js)
+       ========================================================================= */
+    let threeScene, threeCamera, threeRenderer, activeMeshGroup;
+
+    function initThreeJSScene() {
+      const container = document.getElementById('threejs-container');
+      if (!container || threeRenderer) return;
+
+      threeScene = new THREE.Scene();
+      threeCamera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 1000);
+      threeCamera.position.z = 25;
+
+      threeRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      threeRenderer.setSize(container.clientWidth, container.clientHeight);
+      container.appendChild(threeRenderer.domElement);
+
+      const light = new THREE.PointLight(0xffffff, 1.2);
+      light.position.set(20, 20, 20);
+      threeScene.add(light);
+      threeScene.add(new THREE.AmbientLight(0x38bdf8, 0.4));
+
+      load3DModel('dna');
+
+      // Mouse interactive orbit rotation
+      let isDragging = false, prevX = 0, prevY = 0;
+      container.addEventListener('mousedown', (e) => { isDragging = true; prevX = e.clientX; prevY = e.clientY; });
+      window.addEventListener('mouseup', () => isDragging = false);
+      container.addEventListener('mousemove', (e) => {
+        if (!isDragging || !activeMeshGroup) return;
+        activeMeshGroup.rotation.y += (e.clientX - prevX) * 0.01;
+        activeMeshGroup.rotation.x += (e.clientY - prevY) * 0.01;
+        prevX = e.clientX; prevY = e.clientY;
+      });
+
+      function animate3D() {
+        requestAnimationFrame(animate3D);
+        if (activeMeshGroup && !isDragging) {
+          activeMeshGroup.rotation.y += 0.005;
+        }
+        threeRenderer.render(threeScene, threeCamera);
+      }
+      animate3D();
+    }
+
+    window.load3DModel = function(modelType) {
+      if (!threeScene) return;
+      if (activeMeshGroup) threeScene.remove(activeMeshGroup);
+
+      activeMeshGroup = new THREE.Group();
+
+      if (modelType === 'dna') {
+        for (let i = -15; i <= 15; i++) {
+          const t = i * 0.3;
+          const x1 = Math.cos(t) * 6, y1 = i * 0.8, z1 = Math.sin(t) * 6;
+          const x2 = Math.cos(t + Math.PI) * 6, y2 = i * 0.8, z2 = Math.sin(t + Math.PI) * 6;
+
+          const s1 = new THREE.Mesh(new THREE.SphereGeometry(0.5, 12, 12), new THREE.MeshBasicMaterial({ color: 0x38bdf8 }));
+          s1.position.set(x1, y1, z1);
+          const s2 = new THREE.Mesh(new THREE.SphereGeometry(0.5, 12, 12), new THREE.MeshBasicMaterial({ color: 0xf59e0b }));
+          s2.position.set(x2, y2, z2);
+
+          activeMeshGroup.add(s1); activeMeshGroup.add(s2);
+        }
+        document.getElementById('model-3d-hud').innerText = 'Active: DNA Double Helix Macromolecule';
+      } else if (modelType === 'buckyball') {
+        const geo = new THREE.DodecahedronGeometry(8, 1);
+        const mat = new THREE.MeshStandardMaterial({ color: 0x00f2fe, wireframe: true });
+        activeMeshGroup.add(new THREE.Mesh(geo, mat));
+        document.getElementById('model-3d-hud').innerText = 'Active: C60 Fullerene Cage';
+      } else {
+        const core = new THREE.Mesh(new THREE.SphereGeometry(3, 16, 16), new THREE.MeshBasicMaterial({ color: 0xf43f5e }));
+        activeMeshGroup.add(core);
+        const ring = new THREE.Mesh(new THREE.RingGeometry(5, 7, 32), new THREE.MeshBasicMaterial({ color: 0x38bdf8, side: THREE.DoubleSide }));
+        ring.rotation.x = Math.PI / 3;
+        activeMeshGroup.add(ring);
+        document.getElementById('model-3d-hud').innerText = 'Active: Bohr Atomic Shells';
+      }
+
+      threeScene.add(activeMeshGroup);
+    };
+
+    /* =========================================================================
+       11. SPACE ORRERY CANVAS
+       ========================================================================= */
+    let orrerySpeed = 1.0;
+    function initSpaceOrrery() {
+      const canvas = document.getElementById('canvas-space-orrery');
+      if (!canvas) return;
+      canvas.width = canvas.parentElement.clientWidth;
+      canvas.height = canvas.parentElement.clientHeight;
+      const ctx = canvas.getContext('2d');
+      let oTime = 0;
+
+      function renderOrrery() {
+        ctx.fillStyle = '#070b14';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        const cx = canvas.width / 2;
+        const cy = canvas.height / 2;
+
+        // Sun
+        ctx.fillStyle = '#f59e0b';
+        ctx.beginPath(); ctx.arc(cx, cy, 14, 0, Math.PI * 2); ctx.fill();
+
+        const planets = [
+          { r: 40, s: 0.04, c: '#94a3b8' },
+          { r: 70, s: 0.025, c: '#f97316' },
+          { r: 105, s: 0.015, c: '#38bdf8' },
+          { r: 145, s: 0.01, c: '#ef4444' }
+        ];
+
+        oTime += 0.02 * orrerySpeed;
+        planets.forEach(p => {
+          ctx.strokeStyle = 'rgba(56, 189, 248, 0.15)';
+          ctx.beginPath(); ctx.arc(cx, cy, p.r, 0, Math.PI * 2); ctx.stroke();
+
+          const px = cx + Math.cos(oTime * (p.s * 100)) * p.r;
+          const py = cy + Math.sin(oTime * (p.s * 100)) * p.r;
+          ctx.fillStyle = p.c;
+          ctx.beginPath(); ctx.arc(px, py, 4, 0, Math.PI * 2); ctx.fill();
+        });
+
+        requestAnimationFrame(renderOrrery);
+      }
+      renderOrrery();
+    }
+    window.changeOrrerySpeed = function(s) { orrerySpeed = s; };
+
+    /* =========================================================================
+       12. SCIENCE FACTS WITH VECTOR PICTURES
+       ========================================================================= */
+    const SCIENCE_FACTS = [
+      {
+        title: "Extreme Nuclear Density",
+        fact: "A single sugar-cube-sized teaspoon of neutron star matter would weigh approximately 6 billion tons on Earth.",
+        svg: `<svg viewBox="0 0 100 60" class="w-full h-full"><circle cx="50" cy="30" r="14" fill="#6366f1"/><path d="M50 10 L50 50 M30 30 L70 30" stroke="#a855f7" stroke-width="2"/></svg>`
+      },
+      {
+        title: "Gravitational Time Dilation",
+        fact: "Time passes measurably faster at the top of a mountain than at sea level because Earth's gravitational field is weaker higher up.",
+        svg: `<svg viewBox="0 0 100 60" class="w-full h-full"><circle cx="50" cy="30" r="16" fill="none" stroke="#38bdf8" stroke-width="2"/><line x1="50" y1="30" x2="50" y2="18" stroke="#f59e0b" stroke-width="2"/></svg>`
+      },
+      {
+        title: "Quantum Entanglement",
+        fact: "Entangled particles share quantum states instantaneously across arbitrary cosmic distances—what Einstein called 'spooky action at a distance.'",
+        svg: `<svg viewBox="0 0 100 60" class="w-full h-full"><circle cx="25" cy="30" r="8" fill="#00f2fe"/><circle cx="75" cy="30" r="8" fill="#f43f5e"/><path d="M33 30 Q50 15 67 30" stroke="#f59e0b" fill="none" stroke-dasharray="2,2"/></svg>`
+      }
+    ];
+
+    function renderScienceFacts() {
+      const grid = document.getElementById('facts-gallery-grid');
+      const spot = document.getElementById('spotlight-fact-card');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      if (spot && SCIENCE_FACTS[0]) {
+        spot.innerHTML = `
+          <div class="md:col-span-4 h-36 bg-sci-card rounded-xl p-3 flex items-center justify-center border border-amber-500/30">
+            ${SCIENCE_FACTS[0].svg}
+          </div>
+          <div class="md:col-span-8 space-y-2">
+            <span class="text-xs font-mono text-amber-400 font-bold uppercase">Spotlight Discovery</span>
+            <h2 class="text-xl font-bold text-white">${SCIENCE_FACTS[0].title}</h2>
+            <p class="text-xs text-slate-300 leading-relaxed">${SCIENCE_FACTS[0].fact}</p>
+          </div>
+        `;
+      }
+
+      SCIENCE_FACTS.forEach(f => {
+        const c = document.createElement('div');
+        c.className = 'glass-panel p-4 space-y-2 border-slate-700/60';
+        c.innerHTML = `
+          <div class="w-full h-24 bg-sci-card/80 rounded-lg p-2 border border-sci-border flex items-center justify-center">
+            ${f.svg}
+          </div>
+          <h3 class="text-sm font-bold text-white">${f.title}</h3>
+          <p class="text-xs text-slate-400">${f.fact}</p>
+        `;
+        grid.appendChild(c);
+      });
+    }
+
+    /* =========================================================================
+       13. NOVA AI CHAT (Gemini API Integration)
+       ========================================================================= */
+    window.sendQuickNovaPrompt = function(promptText) {
+      document.getElementById('nova-user-input').value = promptText;
+      sendNovaMessage();
+    };
+
+    window.openNovaWithCurrentEq = function() {
+      switchNavTab('nova-ai');
+      document.getElementById('nova-user-input').value = `Explain the formula ${currentEq.formula} (${currentEq.title}) and what happens when variables change.`;
+      sendNovaMessage();
+    };
+
+    async function fetchWithRetry(url, options, maxRetries = 3) {
+      let delay = 1000;
+      for (let i = 0; i < maxRetries; i++) {
+        try {
+          const response = await fetch(url, options);
+          if (response.ok) return response;
+          if (response.status === 429 || response.status >= 500) {
+            await new Promise(r => setTimeout(r, delay));
+            delay *= 2;
+            continue;
+          }
+          return response;
+        } catch (err) {
+          if (i === maxRetries - 1) throw err;
+          await new Promise(r => setTimeout(r, delay));
+          delay *= 2;
+        }
+      }
+      return fetch(url, options);
+    }
+
+    window.sendNovaMessage = async function() {
+      const input = document.getElementById('nova-user-input');
+      const query = input.value.trim();
+      if (!query) return;
+
+      const chatBox = document.getElementById('nova-chat-box');
+      
+      // Append user msg
+      const userMsg = document.createElement('div');
+      userMsg.className = 'p-3 rounded-lg bg-indigo-950/40 border border-indigo-500/30 text-right';
+      userMsg.innerHTML = `<span class="text-indigo-300 font-bold">You:</span> ${query}`;
+      chatBox.appendChild(userMsg);
+      input.value = '';
+
+      // Append typing indicator
+      const typing = document.createElement('div');
+      typing.className = 'p-3 rounded-lg bg-sci-card/80 border border-sci-border text-slate-400 animate-pulse';
+      typing.innerText = 'NOVA AI is analyzing scientific principles...';
+      chatBox.appendChild(typing);
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      try {
+        const apiKey = "";
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+        const response = await fetchWithRetry(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: query }] }],
+            systemInstruction: {
+              parts: [{ text: "You are NOVA, a world-class scientific research mentor in SCI3D. Provide clear, enthusiastic, educational breakdowns of equations, variables, and physics intuition. Keep responses concise (under 120 words)." }]
+            }
+          })
+        });
+
+        const data = await response.json();
+        const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || "Newton's laws explain how forces shape mass and acceleration throughout the cosmos!";
+        
+        typing.remove();
+        const novaMsg = document.createElement('div');
+        novaMsg.className = 'p-3 rounded-lg bg-sci-card border border-indigo-500/40';
+        novaMsg.innerHTML = `<div class="text-indigo-300 font-bold mb-1">NOVA:</div> ${reply}`;
+        chatBox.appendChild(novaMsg);
+      } catch (e) {
+        typing.remove();
+        const fallback = document.createElement('div');
+        fallback.className = 'p-3 rounded-lg bg-sci-card border border-indigo-500/40';
+        fallback.innerHTML = `<div class="text-indigo-300 font-bold mb-1">NOVA:</div> In classical mechanics, net force produces acceleration proportional to mass (F = ma). For velocity and displacement, kinematics equations tie time and acceleration together.`;
+        chatBox.appendChild(fallback);
+      }
+      chatBox.scrollTop = chatBox.scrollHeight;
+    };
+
+    let activeAudio = null;
+
+    function pcmToWav(pcm16Data, sampleRate) {
+      const numChannels = 1;
+      const bytesPerSample = 2;
+      const blockAlign = numChannels * bytesPerSample;
+      const byteRate = sampleRate * blockAlign;
+      const dataSize = pcm16Data.length * bytesPerSample;
+      const buffer = new ArrayBuffer(44 + dataSize);
+      const view = new DataView(buffer);
+
+      function writeString(v, offset, str) {
+        for (let i = 0; i < str.length; i++) v.setUint8(offset + i, str.charCodeAt(i));
+      }
+
+      writeString(view, 0, 'RIFF');
+      view.setUint32(4, 36 + dataSize, true);
+      writeString(view, 8, 'WAVE');
+      writeString(view, 12, 'fmt ');
+      view.setUint32(16, 16, true);
+      view.setUint16(20, 1, true); // PCM
+      view.setUint16(22, numChannels, true);
+      view.setUint32(24, sampleRate, true);
+      view.setUint32(28, byteRate, true);
+      view.setUint16(32, blockAlign, true);
+      view.setUint16(34, 16, true);
+      writeString(view, 36, 'data');
+      view.setUint32(40, dataSize, true);
+
+      let offset = 44;
+      for (let i = 0; i < pcm16Data.length; i++, offset += 2) {
+        view.setInt16(offset, pcm16Data[i], true);
+      }
+      return new Blob([buffer], { type: 'audio/wav' });
+    }
+
+    function base64ToArrayBuffer(base64) {
+      const binaryString = window.atob(base64);
+      const len = binaryString.length;
+      const bytes = new Uint8Array(len);
+      for (let i = 0; i < len; i++) bytes[i] = binaryString.charCodeAt(i);
+      return bytes.buffer;
+    }
+
+    window.speakEquationIntuition = async function() {
+      if (activeAudio) {
+        activeAudio.pause();
+        activeAudio = null;
+        document.getElementById('tts-label').innerText = 'Listen (Gemini Voice)';
+        document.getElementById('tts-icon').innerText = '🔊';
+        return;
+      }
+
+      const btn = document.getElementById('btn-ai-tts');
+      const label = document.getElementById('tts-label');
+      const icon = document.getElementById('tts-icon');
+      label.innerText = 'Synthesizing Audio...';
+      icon.innerText = '⏳';
+
+      const script = `Say cheerfully in a clear scientific voice: The equation ${currentEq.title}, written as ${currentEq.formula}. ${currentEq.explainer.beginner}`;
+
+      try {
+        const apiKey = "";
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`;
+        const payload = {
+          contents: [{ parts: [{ text: script }] }],
+          generationConfig: {
+            responseModalities: ["AUDIO"],
+            speechConfig: {
+              voiceConfig: { prebuiltVoiceConfig: { voiceName: "Zephyr" } }
+            }
+          }
+        };
+
+        const resp = await fetchWithRetry(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await resp.json();
+        const part = data?.candidates?.[0]?.content?.parts?.[0];
+        const audioData = part?.inlineData?.data;
+        const mimeType = part?.inlineData?.mimeType;
+
+        if (audioData && mimeType && mimeType.startsWith("audio/")) {
+          const sampleRateMatch = mimeType.match(/rate=(\d+)/);
+          const sampleRate = sampleRateMatch ? parseInt(sampleRateMatch[1], 10) : 24000;
+          const pcmData = base64ToArrayBuffer(audioData);
+          const pcm16 = new Int16Array(pcmData);
+          const wavBlob = pcmToWav(pcm16, sampleRate);
+          const audioUrl = URL.createObjectURL(wavBlob);
+
+          activeAudio = new Audio(audioUrl);
+          label.innerText = 'Stop Audio';
+          icon.innerText = '⏹️';
+
+          activeAudio.onended = () => {
+            activeAudio = null;
+            label.innerText = 'Listen (Gemini Voice)';
+            icon.innerText = '🔊';
+          };
+          activeAudio.play();
+        } else {
+          throw new Error("No audio returned");
+        }
+      } catch (err) {
+        label.innerText = 'Voice Unavailable';
+        icon.innerText = '⚠️';
+        setTimeout(() => {
+          label.innerText = 'Listen (Gemini Voice)';
+          icon.innerText = '🔊';
+        }, 2500);
+      }
+    };
+
+    window.generateDeepAIDerivation = async function() {
+      const box = document.getElementById('ai-derivation-output');
+      box.classList.remove('hidden');
+      box.innerHTML = `<div class="text-indigo-300 animate-pulse">✨ Gemini is computing step-by-step calculus derivation and real-world engineering case studies for ${currentEq.formula}...</div>`;
+
+      let varState = [];
+      for (let k in currentVariables) varState.push(`${k}=${currentVariables[k]}`);
+
+      const prompt = `Perform a high-level scientific breakdown of the equation ${currentEq.title} (${currentEq.formula}).
+Current experimental values: ${varState.join(', ')}.
+1. Provide a concise 2-line mathematical derivation or limit behavior.
+2. Cite a specific historic real-world engineering victory or failure that hinged on this principle (e.g., aerospace, power grids, or particle physics). Keep it under 110 words total.`;
+
+      try {
+        const apiKey = "";
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+        const resp = await fetchWithRetry(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            systemInstruction: { parts: [{ text: "You are an elite Caltech theoretical physicist explaining equations with rigor and punchy clarity." }] }
+          })
+        });
+
+        const data = await resp.json();
+        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        box.innerHTML = `<div class="text-indigo-300 font-bold mb-1">Deep Derivation & Case Study:</div><div class="text-slate-200 leading-relaxed">${text.replace(/\n/g, '<br>')}</div>`;
+      } catch (e) {
+        box.innerHTML = `<div class="text-rose-400">Failed to generate derivation. Please retry in a moment.</div>`;
+      }
+    };
+
+    window.generateAIChallengeProblem = async function() {
+      const btn = document.getElementById('btn-generate-ai-challenge');
+      const promptEl = document.getElementById('challenge-prompt');
+      btn.innerText = 'Generating...';
+
+      const prompt = `Create an engaging educational challenge problem for high-school or freshman university students based on the active equation ${currentEq.title} (${currentEq.formula}).`;
+
+      try {
+        const apiKey = "";
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+        const payload = {
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            responseMimeType: "application/json",
+            responseSchema: {
+              type: "OBJECT",
+              properties: {
+                prompt: { type: "STRING" },
+                ans: { type: "NUMBER" },
+                hint: { type: "STRING" }
+              },
+              required: ["prompt", "ans", "hint"]
+            }
+          }
+        };
+
+        const resp = await fetchWithRetry(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await resp.json();
+        const jsonText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        const problemObj = JSON.parse(jsonText);
+
+        CHALLENGE_PROBLEMS.push(problemObj);
+        challengeIndex = CHALLENGE_PROBLEMS.length - 1;
+
+        promptEl.innerText = problemObj.prompt;
+        document.getElementById('challenge-answer-input').value = '';
+        document.getElementById('challenge-feedback').classList.add('hidden');
+        document.getElementById('challenge-hint-text').classList.add('hidden');
+        btn.innerText = '✨ New AI Problem';
+      } catch (err) {
+        btn.innerText = '✨ New AI Problem';
+        window.nextChallengeProblem();
+      }
+    };
+
+    window.fetchGroundedScienceNews = async function() {
+      const panel = document.getElementById('grounded-news-panel');
+      const content = document.getElementById('grounded-news-content');
+      const sourcesBox = document.getElementById('grounded-news-sources');
+      const btn = document.getElementById('btn-fetch-grounded-news');
+
+      panel.classList.remove('hidden');
+      content.innerHTML = '<span class="text-sky-300 animate-pulse">Querying Google Search Grounding for the latest 2026 physics and astronomy discoveries...</span>';
+      sourcesBox.innerHTML = '';
+      btn.classList.add('opacity-50');
+
+      const userQuery = "What are the newest breakthrough scientific discoveries or physics/space milestones in 2025 and 2026? Summarize top 3 in bullet points.";
+
+      try {
+        const apiKey = "";
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+        const payload = {
+          contents: [{ parts: [{ text: userQuery }] }],
+          tools: [{ "google_search": {} }],
+          systemInstruction: {
+            parts: [{ text: "You are an astrophysics and quantum research journalist. Provide a concise, bulleted digest of recent verified scientific achievements with dates and scientific context." }]
+          }
+        };
+
+        const response = await fetchWithRetry(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+        const candidate = result.candidates?.[0];
+        const text = candidate?.content?.parts?.[0]?.text || "No report returned.";
+
+        content.innerHTML = text.replace(/\n/g, '<br>');
+
+        let sources = [];
+        const groundingMetadata = candidate?.groundingMetadata;
+        if (groundingMetadata && groundingMetadata.groundingAttributions) {
+          sources = groundingMetadata.groundingAttributions
+            .map(attr => ({ uri: attr.web?.uri, title: attr.web?.title }))
+            .filter(s => s.uri && s.title);
+        }
+
+        if (sources.length > 0) {
+          sourcesBox.innerHTML = '<span class="text-slate-400 font-bold uppercase mr-1">Sources:</span>' +
+            sources.slice(0, 4).map(s => `<a href="${s.uri}" target="_blank" class="px-2 py-0.5 rounded bg-sky-950/60 border border-sky-500/40 text-sky-300 hover:text-white underline truncate max-w-[220px]">${s.title}</a>`).join(' ');
+        }
+      } catch (e) {
+        content.innerHTML = '<span class="text-rose-400">Failed to retrieve search-grounded results. Check network connectivity.</span>';
+      } finally {
+        btn.classList.remove('opacity-50');
+      }
+    };
+
+    /* =========================================================================
+       14. INITIALIZE ON LOAD
+       ========================================================================= */
+    window.onload = function() {
+      // Load first equation
+      loadEquation('f-ma');
+      renderEquationLibrary();
+      renderCoursesGrid();
+      
+      // Initialize 17 Virtual Labs with first active station
+      selectVirtualLab(0);
+      initVirtualLabCanvas();
+
+      renderScienceFacts();
+
+      // Start 2D physical simulations
+      runPhysicsSimulationLoop();
+    };
+  </script>
+</body>
+</html>
